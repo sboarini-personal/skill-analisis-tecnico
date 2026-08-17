@@ -39,15 +39,17 @@ Se edita `analisis-tecnico-boa/`; `instalar-skills/analisis-tecnico-boa/` es una
 Editar lo que corresponda dentro de `analisis-tecnico-boa/`, después:
 
 ```
-python3 tests/run_all.py     # 27 verificaciones, tiene que dar 0 fallas
+python3 tests/run_all.py     # 50 verificaciones, tiene que dar 0 fallas
 python3 build.py             # sincroniza el staging y lo verifica ejecutándolo
 ```
 
 Para que la app tome los cambios hay que cerrarla, copiar el staging al directorio de skills de la app y volver a abrirla. De eso se ocupa el proyecto vecino **Instalador de Skills**, que tiene el script y la explicación completa del porqué:
 
-```
-cd "C:\Users\sboar\OneDrive - AMX Argentina S.A\Personal Docs\Claude\Projects\Instalador de Skills"
-powershell -ExecutionPolicy Bypass -File .\instalar-skills.ps1 -Origen "C:\Users\sboar\OneDrive - AMX Argentina S.A\Personal Docs\Claude\Projects\Skill Analisis Tecnico\instalar-skills"
+Asumiendo que los dos proyectos son carpetas hermanas, desde la raíz de este repo:
+
+```powershell
+cd "..\Instalador de Skills"
+powershell -ExecutionPolicy Bypass -File .\instalar-skills.ps1 -Origen "..\Skill Analisis Tecnico\instalar-skills"
 ```
 
 Y para confirmar después que quedó sana, sin copiar nada:
@@ -74,7 +76,7 @@ Si Node no está instalado, ese cuarto bloque se saltea con aviso en lugar de fa
 
 ## Notas de implementación que conviene no perder
 
-**El frontmatter de `SKILL.md` es frágil por fuera de este repo.** El cargador rechaza el paquete con `SKILL.md frontmatter missing name or description` si el archivo llega con BOM, con saltos CRLF raros o con caracteres que se rompieron en un round-trip por Windows u OneDrive. Por eso `name` y `description` se mantienen en ASCII puro y la descripción va entre comillas dobles. `build.py` normaliza y verifica esto antes de comprimir, y aborta si algo no cierra.
+**El frontmatter de `SKILL.md` es frágil por fuera de este repo.** El cargador rechaza el paquete con `SKILL.md frontmatter missing name or description` si el archivo llega con BOM, con saltos CRLF raros o con caracteres que se rompieron en un round-trip por Windows u OneDrive. Por eso `name` y `description` se mantienen en ASCII puro y la descripción va entre comillas dobles. `build.py` normaliza y verifica esto antes de sincronizar el staging, y aborta si algo no cierra.
 
 **El importador de `.skill` no instala un paquete: instala un documento.** Es la limitación más cara del proyecto y costó una skill rota en silencio durante varias versiones. Al arrastrar un `.skill`, la app toma `SKILL.md`, le parsea el frontmatter para sacar `name` y `description`, guarda el cuerpo como instrucciones y **descarta todo el resto del zip**. No hay ningún paso que copie `scripts/`, `assets/` ni `references/`. El síntoma es traicionero: la skill se instala sin error, se dispara bien, y el modelo lee instrucciones que mandan a ejecutar scripts que no existen. Como no puede, improvisa los indicadores. Es decir, produce exactamente el informe con números inventados que toda la arquitectura busca evitar.
 
