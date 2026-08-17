@@ -7,7 +7,7 @@ Proyecto de desarrollo de la skill `analisis-tecnico-boa`, que genera informes d
 ```
 Skill Analisis Tecnico/
 ├── README.md                        este archivo
-├── build.py                         prepara la skill para instalar y la verifica
+├── build.py                         normaliza, valida y verifica la skill
 ├── analisis-tecnico-boa/            LA SKILL — árbol fuente
 │   ├── SKILL.md                     instrucciones + frontmatter YAML
 │   ├── scripts/
@@ -19,8 +19,6 @@ Skill Analisis Tecnico/
 │       ├── schema.md                contrato de datos campo por campo
 │       ├── scoring.md               rúbrica del score técnico 0-100
 │       └── indicadores.md           qué mide cada indicador y cuándo miente
-├── instalar-skills/                 lo que se copia a la app
-│   └── analisis-tecnico-boa/        copia generada desde el árbol fuente
 ├── examples/
 │   ├── serie_nvda.json              serie OHLCV de entrada
 │   ├── demo_final.json              análisis completo de ejemplo
@@ -32,7 +30,7 @@ Skill Analisis Tecnico/
     └── interact.js                  ejercita toggles, simulador y tooltips
 ```
 
-Se edita `analisis-tecnico-boa/`; `instalar-skills/analisis-tecnico-boa/` es una copia generada, no se toca a mano. El resto es andamiaje de desarrollo.
+Lo único que se instala es `analisis-tecnico-boa/`. El resto es andamiaje de desarrollo y el instalador lo ignora solo, porque copia únicamente las subcarpetas que tengan un `SKILL.md` adentro.
 
 ## Ciclo de trabajo
 
@@ -40,16 +38,16 @@ Editar lo que corresponda dentro de `analisis-tecnico-boa/`, después:
 
 ```
 python3 tests/run_all.py     # 50 verificaciones, tiene que dar 0 fallas
-python3 build.py             # sincroniza el staging y lo verifica ejecutándolo
+python3 build.py             # normaliza, valida el frontmatter y corre el smoke test
 ```
 
-Para que la app tome los cambios hay que cerrarla, copiar el staging al directorio de skills de la app y volver a abrirla. De eso se ocupa el proyecto vecino **Instalador de Skills**, que tiene el script y la explicación completa del porqué:
+`build.py` no copia la skill a ningún lado: es un gate de calidad, no un paso de empaquetado. Para que la app tome los cambios hay que cerrarla, copiar la carpeta de la skill al directorio de skills de la app y volver a abrirla. De eso se ocupa el proyecto vecino **Instalador de Skills**, que tiene el script y la explicación completa del porqué:
 
 Asumiendo que los dos proyectos son carpetas hermanas, desde la raíz de este repo:
 
 ```powershell
 cd "..\Instalador de Skills"
-powershell -ExecutionPolicy Bypass -File .\instalar-skills.ps1 -Origen "..\Skill Analisis Tecnico\instalar-skills"
+powershell -ExecutionPolicy Bypass -File .\instalar-skills.ps1 -Origen "..\Skill Analisis Tecnico"
 ```
 
 Y para confirmar después que quedó sana, sin copiar nada:
@@ -76,7 +74,7 @@ Si Node no está instalado, ese cuarto bloque se saltea con aviso en lugar de fa
 
 ## Notas de implementación que conviene no perder
 
-**El frontmatter de `SKILL.md` es frágil por fuera de este repo.** El cargador rechaza el paquete con `SKILL.md frontmatter missing name or description` si el archivo llega con BOM, con saltos CRLF raros o con caracteres que se rompieron en un round-trip por Windows u OneDrive. Por eso `name` y `description` se mantienen en ASCII puro y la descripción va entre comillas dobles. `build.py` normaliza y verifica esto antes de sincronizar el staging, y aborta si algo no cierra.
+**El frontmatter de `SKILL.md` es frágil por fuera de este repo.** El cargador rechaza el paquete con `SKILL.md frontmatter missing name or description` si el archivo llega con BOM, con saltos CRLF raros o con caracteres que se rompieron en un round-trip por Windows u OneDrive. Por eso `name` y `description` se mantienen en ASCII puro y la descripción va entre comillas dobles. `build.py` normaliza y verifica esto en cada corrida, y aborta si algo no cierra.
 
 **El importador de `.skill` no instala un paquete: instala un documento.** Es la limitación más cara del proyecto y costó una skill rota en silencio durante varias versiones. Al arrastrar un `.skill`, la app toma `SKILL.md`, le parsea el frontmatter para sacar `name` y `description`, guarda el cuerpo como instrucciones y **descarta todo el resto del zip**. No hay ningún paso que copie `scripts/`, `assets/` ni `references/`. El síntoma es traicionero: la skill se instala sin error, se dispara bien, y el modelo lee instrucciones que mandan a ejecutar scripts que no existen. Como no puede, improvisa los indicadores. Es decir, produce exactamente el informe con números inventados que toda la arquitectura busca evitar.
 
@@ -88,7 +86,7 @@ Esto se comprobó, no se supone: las 19 skills instaladas por esta vía tienen e
 
 Queda un riesgo asumido: si la app hiciera un sync de skills podría pisar lo copiado. Se notaría enseguida —las skills volverían a improvisar— y el respaldo que deja el instalador permite revertir.
 
-**Lo que se instala tiene que ser lo que se verifica.** La versión anterior de `build.py` validaba un zip desempaquetado en un temporal, que no era lo que la app instalaba: daba verde con la skill rota. Ahora `build.py` sincroniza el árbol en `instalar-skills/analisis-tecnico-boa/` y **ejecuta los dos scripts desde ahí** generando un informe real, comprobando de paso que pese lo que tiene que pesar y que el marcador de datos haya quedado reemplazado. Es exactamente el árbol que el instalador copia, así que si el layout se rompió, falla ahí.
+**Lo que se instala tiene que ser lo que se verifica.** Una versión vieja de `build.py` validaba un zip desempaquetado en un temporal, que no era lo que la app instalaba: daba verde con la skill rota. Después hubo un staging intermedio en `instalar-skills/`, que era una copia byte a byte del árbol fuente y solo agregaba un modo de falla nuevo —instalar la copia vieja por no haber corrido el build—; se eliminó. Hoy `build.py` **ejecuta los dos scripts desde `analisis-tecnico-boa/` directamente**, generando un informe real y comprobando de paso que pese lo que tiene que pesar y que el marcador de datos haya quedado reemplazado. Es exactamente la carpeta que el instalador copia, así que si el layout se rompió, falla ahí.
 
 **Los mounts de OneDrive y del sandbox no permiten `unlink`.** `rm`, `shutil.rmtree` y `git clone` fallan con `Operation not permitted`. Por eso `sincronizar()` sobreescribe en el lugar en vez de borrar y recrear, y reporta los huérfanos que no pudo borrar en vez de abortar; y por eso cualquier clon de un repo va a `/tmp`.
 

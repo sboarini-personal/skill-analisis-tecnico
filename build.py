@@ -1,13 +1,33 @@
 #!/usr/bin/env python3
 """
-Prepara la skill para instalar y verifica que funcione.
+Verifica que la skill este en condiciones de instalarse. No empaqueta nada.
 
-    python3 build.py                 # sincroniza instalar-skills/analisis-tecnico-boa
-    python3 build.py <destino>       # ademas la copia a otro directorio
+    python3 build.py                 # normaliza, valida y corre el smoke test
+    python3 build.py <destino>       # ademas copia la skill a ese directorio
+
+Este script no mueve la skill a ningun lado por defecto, y eso es deliberado:
+es un gate de calidad, no un paso de empaquetado. Hace tres cosas sobre
+analisis-tecnico-boa/ tal cual esta en el repo, que es exactamente el arbol que
+el instalador va a copiar:
+
+  1. Normaliza a UTF-8 sin BOM y saltos LF. Un round-trip por Windows u
+     OneDrive mete CRLF o BOM sin avisar, y con eso el cargador de la app
+     rechaza la skill con "frontmatter missing name or description".
+  2. Valida el frontmatter y aborta si algo no cierra.
+  3. Ejecuta compute_indicators.py y build_report.py sobre el demo y comprueba
+     que el HTML salga entero. Sin esto se puede instalar una skill que carga
+     bien y recien explota cuando se la usa contra un ticker real.
 
 Despues hay que correr el instalador, que es lo que la deja en el directorio de
 skills de la app. Vive en el proyecto vecino "Instalador de Skills" y se le
-apunta -Origen a la carpeta instalar-skills/ de aca.
+apunta -Origen a la RAIZ de este proyecto: el script busca subcarpetas que
+tengan SKILL.md adentro, encuentra analisis-tecnico-boa/ e ignora solo el
+andamiaje (tests/, examples/, este archivo).
+
+Hubo un staging intermedio en instalar-skills/ y se elimino el 2026-08-17: era
+una copia byte a byte del arbol fuente, herencia de cuando esto generaba un
+.skill. Lo unico que agregaba era un modo de falla nuevo, instalar la copia
+vieja por no haber corrido el build.
 
 POR QUE NO SE GENERA UN .skill
 ------------------------------
@@ -56,7 +76,6 @@ import sys
 
 RAIZ = os.path.dirname(os.path.abspath(__file__))
 FUENTE = os.path.join(RAIZ, "analisis-tecnico-boa")
-STAGING = os.path.join(RAIZ, "instalar-skills", "analisis-tecnico-boa")
 EJEMPLOS = os.path.join(RAIZ, "examples")
 
 
@@ -138,10 +157,10 @@ def sincronizar(destino):
 def verificar(destino):
     """Corre los scripts DESDE el destino y genera un informe real.
 
-    Esta verificacion vale porque ejecuta el mismo arbol que se va a copiar al
-    directorio de la app. La version vieja de este script validaba un zip
-    desempaquetado en un temporal, que no era lo que se instalaba: daba verde
-    con la skill rota.
+    Esta verificacion vale porque ejecuta el mismo arbol que el instalador va a
+    copiar al directorio de la app. Una version vieja de este script validaba un
+    zip desempaquetado en un temporal, que no era lo que se instalaba: daba
+    verde con la skill rota.
     """
     problemas = []
     if not os.path.isfile(os.path.join(destino, "SKILL.md")):
@@ -194,35 +213,32 @@ def main():
         sys.exit(1)
     print("Frontmatter OK: name y description presentes, ASCII puro, sin BOM")
 
-    quedan = sincronizar(STAGING)
-    print("\nSincronizada en instalar-skills/analisis-tecnico-boa/")
-    if quedan:
-        print("  AVISO: sobran archivos que no se pudieron borrar "
-              "(el mount no permite unlink). Borralos a mano:")
-        for r in quedan:
-            print(f"    {r}")
-
-    print("\nVerificando: se ejecutan los scripts desde ahi...")
-    fallas = verificar(STAGING)
+    print("\nVerificando: se ejecutan los scripts desde analisis-tecnico-boa/...")
+    fallas = verificar(FUENTE)
     if fallas:
         print("\nERROR: no pasa la verificacion:", file=sys.stderr)
         for x in fallas:
             print(f"  - {x}", file=sys.stderr)
         sys.exit(1)
-    print("  OK: compute_indicators.py y build_report.py corren desde el staging")
+    print("  OK: compute_indicators.py y build_report.py corren desde ahi")
     print("  OK: el informe se genera completo y con los datos inyectados")
 
     if len(sys.argv) > 1:
         extra = os.path.join(os.path.abspath(sys.argv[1]), "analisis-tecnico-boa")
-        sincronizar(extra)
-        print(f"  copiada tambien a {extra}")
+        quedan = sincronizar(extra)
+        print(f"\nCopiada tambien a {extra}")
+        if quedan:
+            print("  AVISO: sobran archivos que no se pudieron borrar "
+                  "(el mount no permite unlink). Borralos a mano:")
+            for r in quedan:
+                print(f"    {r}")
 
-    print("\nAhora, para que la app la vea: cerra la app, corre el instalador")
-    print("desde el proyecto \"Instalador de Skills\" apuntando a este staging:")
-    print("  cd \"...\\Projects\\Instalador de Skills\"")
+    print("\nLa skill esta lista. Para que la app la vea: cerra la app, corre el")
+    print("instalador desde el proyecto \"Instalador de Skills\" apuntando a la")
+    print("raiz de este proyecto, y volve a abrirla.")
+    print("  cd \"..\\Instalador de Skills\"")
     print("  powershell -ExecutionPolicy Bypass -File .\\instalar-skills.ps1 "
-          "-Origen \"%s\"" % os.path.join(RAIZ, "instalar-skills"))
-    print("y volve a abrirla.")
+          "-Origen \"%s\"" % RAIZ)
 
 
 if __name__ == "__main__":
