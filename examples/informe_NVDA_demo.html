@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NVDA · Análisis técnico · 2026-08-15</title>
+<style>
+:root{
+  color-scheme: light;
+  --bg:#f6f7f9; --card:#ffffff; --ink:#12161c; --ink2:#4a5460; --ink3:#828c99;
+  --line:#e3e7ec; --line2:#eef1f5;
+  --bull:#128f4b; --bull-bg:#e6f5ed;
+  --bear:#c8302a; --bear-bg:#fdeceb;
+  --neut:#8a6d1f; --neut-bg:#fdf5e0;
+  --accent:#1f4f9c; --accent-bg:#eaf0fa;
+  --shadow:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.06);
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+  font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1160px;margin:0 auto;padding:26px 20px 70px}
+h1,h2,h3{line-height:1.25;margin:0}
+a{color:var(--accent)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* ---------- header ---------- */
+.hero{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;box-shadow:var(--shadow)}
+.hero-top{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start;justify-content:space-between}
+.tickerbox{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.ticker{font-size:32px;font-weight:700;letter-spacing:-.5px}
+.company{font-size:15px;color:var(--ink2)}
+.sector{display:inline-block;font-size:12px;font-weight:600;color:var(--accent);
+  background:var(--accent-bg);border-radius:999px;padding:3px 10px}
+.pricebox{text-align:right}
+.price{font-size:30px;font-weight:700;letter-spacing:-.5px}
+.chg{font-size:14px;font-weight:600}
+.up{color:var(--bull)} .down{color:var(--bear)} .flat{color:var(--ink3)}
+.meta-line{margin-top:12px;font-size:12.5px;color:var(--ink3);display:flex;gap:16px;flex-wrap:wrap}
+
+.hero-grid{display:grid;grid-template-columns:230px 1fr;gap:24px;margin-top:20px;
+  border-top:1px solid var(--line2);padding-top:20px}
+@media(max-width:760px){.hero-grid{grid-template-columns:1fr}}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.chip{font-size:12.5px;font-weight:700;border-radius:8px;padding:5px 11px;border:1px solid transparent}
+.chip .lbl{font-weight:500;opacity:.75;margin-right:5px}
+.c-bull{background:var(--bull-bg);color:var(--bull);border-color:#bfe4d0}
+.c-bear{background:var(--bear-bg);color:var(--bear);border-color:#f3ccc9}
+.c-neut{background:var(--neut-bg);color:var(--neut);border-color:#ecdcae}
+.c-acc{background:var(--accent-bg);color:var(--accent);border-color:#c8d8f0}
+.tesis{font-size:15.5px;color:var(--ink)}
+
+/* ---------- nav ---------- */
+.nav{position:sticky;top:0;z-index:40;background:rgba(246,247,249,.94);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);margin:20px -20px 0;padding:9px 20px;display:flex;gap:6px;
+  overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{font-size:13px;font-weight:600;color:var(--ink2);text-decoration:none;padding:5px 11px;
+  border-radius:7px;white-space:nowrap}
+.nav a:hover{background:var(--line2);color:var(--ink)}
+
+/* ---------- cards ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;
+  margin-top:20px;box-shadow:var(--shadow)}
+.card h2{font-size:19px;font-weight:700;display:flex;align-items:center;gap:9px;margin-bottom:4px}
+.card h2 .num{font-size:12px;font-weight:700;color:var(--accent);background:var(--accent-bg);
+  width:24px;height:24px;border-radius:7px;display:grid;place-items:center;flex:none}
+.sub{font-size:13px;color:var(--ink3);margin:2px 0 16px 33px}
+.card h3{font-size:14px;font-weight:700;color:var(--ink2);text-transform:uppercase;
+  letter-spacing:.5px;margin:22px 0 10px}
+p{margin:0 0 12px}
+.sub2{font-size:12.5px;color:var(--ink3);margin:-4px 0 12px;max-width:78ch;line-height:1.6}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+
+/* ---------- volumen institucional ---------- */
+.vp-wrap{display:grid;grid-template-columns:minmax(0,520px) 1fr;gap:24px;align-items:start}
+@media(max-width:900px){.vp-wrap{grid-template-columns:1fr}}
+.vp-kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:13.5px;margin-bottom:14px}
+.vp-kv dt{color:var(--ink3);font-size:12.5px}
+.vp-kv dd{margin:0;font-family:var(--mono);font-weight:600}
+.k-state{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;
+  padding:6px 12px;border-radius:8px;border:1px solid var(--line);margin-bottom:10px}
+.k-acum{background:#e7f5ec;border-color:#a9d9bd;color:#0d6e3a}
+.k-dist{background:#fdecea;border-color:#f0b4ae;color:#a8261f}
+.k-neut{background:#f2f4f7;border-color:var(--line);color:var(--ink2)}
+.k-legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--ink2);margin-top:10px}
+.k-legend span.sw{width:11px;height:11px;border-radius:3px;display:inline-block;margin-right:5px;
+  vertical-align:-1px}
+.zone-tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 7px;border-radius:5px;
+  background:var(--accent-bg);color:var(--accent);margin-left:6px}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:820px){.cols2,.cols3{grid-template-columns:1fr}}
+
+/* ---------- tables ---------- */
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink3);
+  font-weight:700;padding:0 10px 8px;border-bottom:1px solid var(--line)}
+td{padding:10px;border-bottom:1px solid var(--line2);vertical-align:top}
+tr:last-child td{border-bottom:none}
+.num-col{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px}
+.t-bull{background:var(--bull-bg);color:var(--bull)}
+.t-bear{background:var(--bear-bg);color:var(--bear)}
+.t-neut{background:var(--neut-bg);color:var(--neut)}
+
+/* ---------- chart ---------- */
+.chart-tools{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
+.tgl{font-size:12.5px;font-weight:600;border:1px solid var(--line);background:#fff;color:var(--ink2);
+  border-radius:8px;padding:5px 11px;cursor:pointer;user-select:none;display:inline-flex;align-items:center;gap:6px}
+.tgl:hover{border-color:var(--ink3)}
+.tgl.on{background:var(--accent-bg);border-color:#b9cdea;color:var(--accent)}
+.tgl .dot{width:9px;height:9px;border-radius:3px;background:currentColor;opacity:.85;flex:none}
+.chart-box{width:100%;overflow:hidden;border:1px solid var(--line2);border-radius:10px;background:#fff}
+svg{display:block;width:100%;height:auto}
+.axis{font-size:11px;fill:var(--ink3)}
+.gridline{stroke:var(--line2);stroke-width:1}
+.lvl-label{font-size:10.5px;font-weight:700}
+
+/* ---------- gauge / score ---------- */
+.score-wrap{display:grid;grid-template-columns:250px 1fr;gap:26px;align-items:center}
+@media(max-width:760px){.score-wrap{grid-template-columns:1fr}}
+.bar-row{display:grid;grid-template-columns:150px 1fr 62px;gap:12px;align-items:center;margin-bottom:9px;font-size:13.5px}
+.bar-track{height:22px;background:var(--line2);border-radius:6px;overflow:hidden;position:relative}
+.bar-fill{height:100%;border-radius:6px;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.bar-val{text-align:right;font-family:var(--mono);font-size:13px;color:var(--ink2)}
+.bar-note{grid-column:1/-1;font-size:12.5px;color:var(--ink3);margin:-4px 0 10px 162px}
+
+/* ---------- indicadores ---------- */
+.ind{border:1px solid var(--line);border-radius:11px;padding:13px 15px;margin-bottom:10px;
+  cursor:help;transition:border-color .15s,background .15s}
+.ind:hover{border-color:var(--accent);background:#fbfcfe}
+.ind-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.ind-name{font-weight:700;font-size:14.5px}
+.ind-tf{font-size:11px;color:var(--ink3);font-weight:600;margin-left:7px}
+.ind-val{font-family:var(--mono);font-size:16px;font-weight:700}
+.ind-read{font-size:13px;color:var(--ink2);margin-top:5px}
+.scale{margin-top:9px;height:14px;position:relative;border-radius:4px;overflow:hidden;background:var(--line2)}
+.scale .zone{position:absolute;top:0;bottom:0}
+.marker{position:absolute;top:-3px;bottom:-3px;width:3px;background:var(--ink);border-radius:2px;
+  box-shadow:0 0 0 2px #fff}
+.scale-ends{display:flex;justify-content:space-between;font-size:10.5px;color:var(--ink3);margin-top:3px}
+
+#tip{position:fixed;z-index:100;max-width:330px;background:#12161c;color:#fff;font-size:12.5px;
+  line-height:1.5;padding:10px 13px;border-radius:9px;pointer-events:none;opacity:0;
+  transition:opacity .12s;box-shadow:0 8px 24px rgba(0,0,0,.22)}
+#tip b{color:#8fd6ff}
+#tip .tip-sec{display:block;margin-top:6px}
+
+/* ---------- niveles ---------- */
+.lvl-list{list-style:none;padding:0;margin:0}
+.lvl-item{display:grid;grid-template-columns:92px 74px 1fr;gap:12px;align-items:center;
+  padding:9px 0;border-bottom:1px solid var(--line2);font-size:13.5px}
+.lvl-item:last-child{border-bottom:none}
+.lvl-px{font-family:var(--mono);font-weight:700;font-size:15px}
+.dist{font-size:11.5px;color:var(--ink3);font-family:var(--mono)}
+.strength{display:inline-flex;gap:3px}
+.strength i{width:7px;height:7px;border-radius:50%;background:var(--line);display:block}
+.strength i.f{background:currentColor}
+
+/* ---------- calculadora / simulador ---------- */
+.panel{background:#fafbfc;border:1px solid var(--line);border-radius:12px;padding:17px 19px}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:4px;
+  text-transform:uppercase;letter-spacing:.4px}
+.field input{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:8px;font-size:15px;
+  font-family:var(--mono);background:#fff;color:var(--ink)}
+.field input:focus{outline:2px solid var(--accent-bg);border-color:var(--accent)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.out{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;
+  border-bottom:1px dashed var(--line);font-size:13.5px}
+.out:last-child{border-bottom:none}
+.out .k{color:var(--ink2)}
+.out .v{font-family:var(--mono);font-weight:700;font-size:15px}
+.out.big .v{font-size:19px}
+input[type=range]{width:100%;accent-color:var(--accent);margin:6px 0}
+.sim-price{font-size:30px;font-weight:700;font-family:var(--mono);letter-spacing:-1px}
+.sim-badge{font-size:12px;font-weight:700;border-radius:7px;padding:4px 10px;display:inline-block}
+
+/* ---------- misc ---------- */
+.callout{border-left:3px solid var(--accent);background:var(--accent-bg);padding:12px 16px;
+  border-radius:0 9px 9px 0;font-size:14px;margin:14px 0}
+.callout.warn{border-color:var(--bear);background:var(--bear-bg)}
+ul.clean{margin:0;padding-left:20px;font-size:14px}
+ul.clean li{margin-bottom:7px}
+.footer{margin-top:26px;font-size:11.5px;color:var(--ink3);line-height:1.65}
+.footer b{color:var(--ink2)}
+.srcs{font-size:12px;color:var(--ink3);margin-top:10px}
+.srcs a{color:var(--ink3)}
+.pill-tf{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px;
+  background:var(--line2);color:var(--ink2);margin-right:6px}
+.est{font-size:10px;font-weight:700;color:var(--neut);background:var(--neut-bg);
+  border-radius:4px;padding:1px 5px;margin-left:5px;vertical-align:middle}
+@media print{
+  .nav{display:none} body{background:#fff}
+  .card,.hero{box-shadow:none;break-inside:avoid;page-break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div id="tip"></div>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="hero-top">
+      <div>
+        <div class="tickerbox">
+          <span class="ticker" id="h-ticker"></span>
+          <span class="company" id="h-company"></span>
+        </div>
+        <div style="margin-top:8px"><span class="sector" id="h-sector"></span></div>
+      </div>
+      <div class="pricebox">
+        <div class="price mono" id="h-price"></div>
+        <div class="chg mono" id="h-chg"></div>
+      </div>
+    </div>
+    <div class="meta-line" id="h-meta"></div>
+    <div class="hero-grid">
+      <div><div class="chart-box" style="border:none"><svg id="gauge" viewBox="0 0 240 150"></svg></div></div>
+      <div>
+        <div class="chips" id="h-chips"></div>
+        <div class="tesis" id="h-tesis"></div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <a href="#grafico">Gráfico</a><a href="#score">Score</a><a href="#tendencia">Tendencia</a>
+    <a href="#indicadores">Indicadores</a><a href="#volumen">Volumen institucional</a>
+    <a href="#patrones">Patrones</a><a href="#niveles">Niveles</a>
+    <a href="#fundamental">Valuación</a><a href="#riesgo">Gestión de riesgo</a>
+    <a href="#escenarios">Escenarios</a><a href="#conclusion">Conclusión</a>
+  </nav>
+
+  <!-- GRAFICO -->
+  <section class="card" id="grafico">
+    <h2><span class="num">1</span>Gráfico de precio</h2>
+    <div class="sub" id="g-sub"></div>
+    <div class="chart-tools" id="g-tools"></div>
+    <div class="chart-box"><svg id="pricechart" viewBox="0 0 1000 470"></svg></div>
+    <div class="srcs">Activá o desactivá cada capa para aislar lo que querés ver. Pasá el cursor sobre las velas para el detalle OHLC.</div>
+  </section>
+
+  <!-- SCORE -->
+  <section class="card" id="score">
+    <h2><span class="num">2</span>Cómo se compone el score técnico</h2>
+    <div class="sub">Desagregado del puntaje: cada bloque aporta hasta su peso máximo.</div>
+    <div id="score-bars"></div>
+  </section>
+
+  <!-- TENDENCIA -->
+  <section class="card" id="tendencia">
+    <h2><span class="num">3</span>Tendencia multi-timeframe</h2>
+    <div class="sub">La confluencia entre marcos temporales define el sesgo direccional.</div>
+    <div id="tf-grid" class="cols2"></div>
+    <div id="tf-conf"></div>
+  </section>
+
+  <!-- INDICADORES -->
+  <section class="card" id="indicadores">
+    <h2><span class="num">4</span>Indicadores</h2>
+    <div class="sub">Pasá el cursor sobre cada indicador para ver qué mide y por qué apunta en esa dirección.</div>
+    <div id="ind-list" class="cols2"></div>
+  </section>
+
+  <!-- VOLUMEN INSTITUCIONAL -->
+  <section class="card" id="volumen">
+    <h2><span class="num">5</span>Volumen institucional</h2>
+    <div class="sub">Dónde se negoció el volumen y quién lo estuvo negociando.</div>
+
+    <div id="vp-block">
+      <h3>Perfil de volumen</h3>
+      <div class="sub2">El precio no pasa el mismo tiempo en todos lados. Las zonas con más volumen negociado actúan como imán y como soporte o resistencia real, porque ahí hay posiciones que defender.</div>
+      <div class="vp-wrap">
+        <div class="chart-box"><svg id="vpchart" viewBox="0 0 520 360"></svg></div>
+        <div id="vp-read"></div>
+      </div>
+    </div>
+
+    <div id="k-block">
+      <h3>Koncorde</h3>
+      <div class="sub2">Separa el volumen de la mano fuerte (azul) del de la mano débil (verde). La mano fuerte acumula cuando nadie mira y distribuye cuando todos compran, así que la divergencia entre ambas áreas suele adelantarse al precio.</div>
+      <div class="chart-tools" id="k-tools"></div>
+      <div class="chart-box"><svg id="kchart" viewBox="0 0 1000 300"></svg></div>
+      <div id="k-read"></div>
+    </div>
+  </section>
+
+  <!-- PATRONES -->
+  <section class="card" id="patrones">
+    <h2><span class="num">6</span>Patrones de precio</h2>
+    <div class="sub">Formaciones detectadas, su estado de confirmación y objetivo teórico.</div>
+    <div id="pat-list"></div>
+  </section>
+
+  <!-- NIVELES -->
+  <section class="card" id="niveles">
+    <h2><span class="num">7</span>Soportes y resistencias</h2>
+    <div class="sub">Distancia calculada contra el precio actual. La fuerza refleja cuántas veces el nivel fue respetado y su confluencia.</div>
+    <div class="cols2">
+      <div><h3 style="margin-top:0;color:var(--bear)">Resistencias</h3><ul class="lvl-list" id="res-list"></ul></div>
+      <div><h3 style="margin-top:0;color:var(--bull)">Soportes</h3><ul class="lvl-list" id="sop-list"></ul></div>
+    </div>
+  </section>
+
+  <!-- FUNDAMENTAL -->
+  <section class="card" id="fundamental">
+    <h2><span class="num">8</span>Capa de valuación</h2>
+    <div class="sub">Contexto fundamental mínimo: si el múltiplo está estirado, el setup técnico tiene menos margen.</div>
+    <div class="cols2">
+      <div class="chart-box" style="border:none"><svg id="pechart" viewBox="0 0 480 230"></svg></div>
+      <div id="fund-read"></div>
+    </div>
+  </section>
+
+  <!-- RIESGO -->
+  <section class="card" id="riesgo">
+    <h2><span class="num">9</span>Gestión de riesgo</h2>
+    <div class="sub">El plan solo es válido mientras se respete la invalidación. Usá la calculadora para dimensionar la posición según tu capital.</div>
+    <div class="chart-box" style="border:none;margin-bottom:8px"><svg id="rrchart" viewBox="0 0 1000 180"></svg></div>
+    <div class="cols2" style="margin-top:14px">
+      <div class="panel">
+        <h3 style="margin:0 0 12px">Calculadora de posición</h3>
+        <div class="field-row">
+          <div class="field"><label>Capital total</label><input type="number" id="c-cap" step="any"></div>
+          <div class="field"><label>Riesgo por operación %</label><input type="number" id="c-risk" step="any" value="1"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Entrada</label><input type="number" id="c-entry" step="any"></div>
+          <div class="field"><label>Stop loss</label><input type="number" id="c-sl" step="any"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Take profit 1</label><input type="number" id="c-tp1" step="any"></div>
+          <div class="field"><label>Take profit 2</label><input type="number" id="c-tp2" step="any"></div>
+        </div>
+        <div id="calc-out" style="margin-top:6px"></div>
+      </div>
+      <div>
+        <div id="rr-table"></div>
+        <div id="invalid-box"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ESCENARIOS -->
+  <section class="card" id="escenarios">
+    <h2><span class="num">10</span>Escenarios y probabilidades</h2>
+    <div class="sub">Distribución de resultados esperada. Mové el simulador para ver el retorno en cualquier precio.</div>
+    <div class="cols2">
+      <div class="chart-box" style="border:none"><svg id="scenchart" viewBox="0 0 480 250"></svg></div>
+      <div id="scen-list"></div>
+    </div>
+    <h3>Simulador de precio</h3>
+    <div class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px">
+        <div><div class="sim-price" id="sim-px"></div>
+          <div style="font-size:12px;color:var(--ink3)">precio simulado</div></div>
+        <div style="text-align:right"><div class="sim-badge" id="sim-badge"></div></div>
+      </div>
+      <input type="range" id="sim-range" min="0" max="1000" value="500">
+      <div class="cols3" style="gap:10px">
+        <div class="out"><span class="k">Retorno vs entrada</span><span class="v" id="sim-ret"></span></div>
+        <div class="out"><span class="k">Múltiplo de R</span><span class="v" id="sim-r"></span></div>
+        <div class="out"><span class="k">Resultado s/ capital</span><span class="v" id="sim-pnl"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONCLUSION -->
+  <section class="card" id="conclusion">
+    <h2><span class="num">11</span>Conclusión</h2>
+    <div id="concl"></div>
+    <div id="riesgos-box"></div>
+  </section>
+
+  <div class="footer" id="footer"></div>
+</div>
+
+<script>
+const DATA = {"meta": {"ticker": "NVDA", "nombre": "NVIDIA Corporation", "sector": "Semiconductores", "exchange": "NASDAQ", "moneda": "USD", "decimales": 2, "precio_actual": 181.02, "variacion_dia_pct": -0.85, "fecha_analisis": "2026-08-15", "horizonte": "4-8 semanas", "rango_52s": [86.62, 184.48], "fuentes": [{"nombre": "Yahoo Finance", "url": "https://finance.yahoo.com/quote/NVDA"}]}, "resumen": {"score": 69, "sesgo": "Alcista", "confianza": "Media", "tesis": "Tendencia alcista intacta en semanal con el precio consolidando bajo el máximo histórico. El momentum se enfrió sin romper estructura. Zona de entrada 170-173 con stop bajo 165."}, "scoring": [{"componente": "Tendencia", "peso": 25, "puntaje": 20, "nota": "Alcista en diario: P > WMA10 > WMA21 > EMA50 con las tres en pendiente positiva y cruce rápido alcista reciente. Sin SMA200 por serie corta, así que el régimen de largo plazo no se puede verificar y el puntaje queda topeado."}, {"componente": "Momentum", "peso": 20, "puntaje": 13, "nota": "RSI 58 saliendo de sobrecompra; histograma del MACD contrayéndose."}, {"componente": "Estructura de niveles", "peso": 20, "puntaje": 14, "nota": "Precio en mitad alta del rango, soporte fuerte 4,7% abajo."}, {"componente": "Volumen", "peso": 15, "puntaje": 11, "nota": "Volumen relativo neutro (0,98x). El perfil ubica al precio en la mitad alta de la value area, con el POC en 178,62 haciendo de soporte. El Koncorde muestra al azul recuperando fuerte pero todavía bajo cero: la mano fuerte volvió sin completar la reposición."}, {"componente": "Patrones", "peso": 10, "puntaje": 6, "nota": "Bandera alcista en formación, sin ruptura."}, {"componente": "Valuación", "peso": 10, "puntaje": 5, "nota": "P/E forward 32 vs 41 actual; prima sobre el sector justificada por crecimiento de EPS."}], "tendencia": {"diario": {"direccion": "Neutral", "estructura": "Rango 168-182", "comentario": "Consolidación lateral tras el impulso de julio."}, "semanal": {"direccion": "Alcista", "estructura": "Máximos y mínimos crecientes", "comentario": "Canal ascendente intacto desde abril."}, "confluencia": "Semanal manda: la consolidación diaria es una pausa dentro de tendencia mayor, no un techo. Operar largo en retrocesos."}, "indicadores": [{"nombre": "RSI (14)", "timeframe": "Diario", "valor": "57,3", "sesgo": "Alcista", "que_mide": "Compara la magnitud de las subas recientes contra la de las bajas para medir la fuerza del movimiento. Se mueve entre 0 y 100. Sobre 70 se considera sobrecomprado, bajo 30 sobrevendido.", "lectura": "RSI en 57.3: momentum positivo pero lejos de la sobrecompra. Queda recorrido antes de que el indicador sea un problema.", "limitacion": "En tendencias fuertes puede quedar sobre 70 durante semanas sin que el precio corrija.", "escala": {"min": 0, "max": 100, "valor": 57.3, "dec": 1, "zonas": [{"desde": 0, "hasta": 30, "color": "bull"}, {"desde": 30, "hasta": 70, "color": "neut"}, {"desde": 70, "hasta": 100, "color": "bear"}]}}, {"nombre": "MACD (12,26,9)", "timeframe": "Diario", "valor": "1.774 / señal 0.672", "sesgo": "Alcista", "que_mide": "Mide la distancia entre dos medias exponenciales de 12 y 26 periodos. El histograma muestra si el impulso se acelera o se agota.", "lectura": "MACD en 1.774 contra una señal de 0.672; histograma en 1.103. El cruce sigue del lado alcista pero la separación se achicó.", "limitacion": "Es rezagado: confirma movimientos ya iniciados y da cruces falsos en lateral."}, {"nombre": "ADX (14)", "timeframe": "Diario", "valor": "11.9", "sesgo": "Neutral", "que_mide": "Mide la fuerza de la tendencia sin decir su dirección. Sobre 25 hay tendencia con la que se puede operar; bajo 20 el mercado es lateral y las señales direccionales fallan.", "lectura": "ADX en 11.9, bien debajo de 25: no hay tendencia medible pese a que +DI (42.7) supera a -DI (32.9). El movimiento reciente es rango, no impulso.", "limitacion": "Tarda en reflejar el arranque de una tendencia nueva.", "escala": {"min": 0, "max": 60, "valor": 11.9, "dec": 1, "zonas": [{"desde": 0, "hasta": 20, "color": "bear"}, {"desde": 20, "hasta": 25, "color": "neut"}, {"desde": 25, "hasta": 60, "color": "bull"}]}}, {"nombre": "Medias móviles", "timeframe": "Diario", "valor": "P > WMA10 > WMA21 > EMA50", "sesgo": "Alcista", "que_mide": "Cuatro medias con dos funciones. El par rápido WMA10/WMA21 pondera linealmente los cierres, así que reacciona antes que una media simple: su cruce es la primera señal de que la tendencia de corto plazo cambió de mano. El par estructural EMA50/SMA200 marca el régimen y actúa como soporte dinámico, porque son los niveles que mira todo el mercado.", "lectura": "Abanico ordenado al alza: precio 181.02 sobre WMA10 (178.45), WMA21 (176.11) y EMA50 (173.71). La WMA10 cruzó sobre la WMA21 el 2026-08-10, hace 2 ruedas, y la separación ya es de 1.33%: el giro se está abriendo, no oscilando. Con 150 velas no hay SMA200, así que el régimen de largo plazo queda sin verificar.", "limitacion": "En rangos laterales el par rápido cruza varias veces por mes sin significado. Con ADX en 11,9 este cruce todavía no tiene tendencia que lo sostenga: es un aviso, no una confirmación."}, {"nombre": "Volumen relativo (20)", "timeframe": "Diario", "valor": "0.98x", "sesgo": "Neutral", "que_mide": "Compara el volumen de la sesión contra el promedio de las últimas 20. Sobre 1,5x hay convicción; bajo 0,8x el movimiento carece de participación.", "lectura": "Volumen en 0.98x el promedio de 20 ruedas: participación normal, sin convicción en ninguna dirección.", "limitacion": "Un pico aislado por vencimiento de opciones o rebalanceo de índices no dice nada sobre la tendencia."}, {"nombre": "ATR (14)", "timeframe": "Diario", "valor": "4.13 (2.28%)", "sesgo": "Neutral", "que_mide": "Recorrido promedio real de cada sesión, incluyendo huecos. Sirve para dimensionar el stop: por debajo de 1 ATR el ruido normal lo activa.", "lectura": "ATR de 4.13 (2.28% del precio). Un stop más cerca de eso salta por ruido; el del plan está a más de 2 ATR.", "limitacion": "Mide volatilidad, no dirección."}], "patrones": [{"nombre": "Bandera alcista", "timeframe": "Diario", "tipo": "continuación", "estado": "en formación", "objetivo": 198.4, "sesgo": "alcista", "implicancia": "Ruptura sobre 182 proyecta el mástil previo."}], "niveles": {"soportes": [{"precio": 168.2, "fuerza": "fuerte", "origen": "Base del rango + EMA50"}, {"precio": 158.0, "fuerza": "media", "origen": "Mínimo de junio"}], "resistencias": [{"precio": 182.0, "fuerza": "fuerte", "origen": "Techo del rango, tres rechazos"}, {"precio": 184.48, "fuerza": "media", "origen": "Máximo histórico"}]}, "precio_serie": {"timeframe": "Diario", "fechas": ["2026-01-15", "2026-01-16", "2026-01-19", "2026-01-20", "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-26", "2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-06", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-01", "2026-05-04", "2026-05-05", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-19", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30", "2026-07-31", "2026-08-03", "2026-08-04", "2026-08-05", "2026-08-06", "2026-08-07", "2026-08-10", "2026-08-11", "2026-08-12"], "ohlc": [[118.08, 118.24, 117.62, 117.84], [118.3, 118.6, 117.04, 117.77], [119.16, 120.35, 118.46, 119.07], [119.8, 121.88, 119.16, 120.62], [121.71, 122.12, 121.25, 121.74], [122.75, 124.34, 122.34, 123.07], [121.69, 122.31, 121.62, 122.06], [122.84, 123.76, 122.45, 123.06], [121.72, 122.03, 120.51, 121.6], [124.04, 125.28, 123.96, 125.04], [126.63, 127.78, 126.0, 126.66], [130.13, 130.41, 129.29, 129.38], [131.03, 131.71, 130.03, 131.35], [131.16, 132.75, 129.34, 130.48], [134.83, 136.37, 132.49, 134.52], [132.51, 133.89, 131.63, 133.11], [134.43, 135.71, 133.7, 134.19], [135.21, 137.11, 134.43, 136.06], [131.1, 132.1, 129.68, 131.43], [133.73, 135.74, 133.29, 134.44], [136.09, 136.19, 134.81, 135.74], [135.71, 135.73, 134.43, 135.15], [139.13, 140.54, 139.02, 139.38], [139.86, 140.72, 138.03, 139.08], [137.83, 138.77, 136.78, 137.49], [138.42, 138.9, 138.19, 138.34], [140.33, 140.97, 139.85, 140.33], [141.45, 142.0, 141.43, 141.69], [141.5, 143.06, 139.1, 141.28], [142.65, 142.86, 142.06, 142.43], [143.39, 145.78, 143.08, 143.69], [143.79, 143.97, 141.44, 143.92], [146.49, 147.24, 145.66, 147.18], [150.83, 152.19, 150.52, 151.87], [153.88, 156.56, 152.54, 155.55], [151.79, 152.88, 151.55, 151.68], [154.6, 154.68, 153.09, 154.51], [155.88, 156.95, 153.34, 154.19], [155.55, 155.76, 154.52, 155.12], [151.58, 152.46, 150.28, 151.21], [155.84, 157.22, 154.5, 155.38], [153.02, 154.48, 151.74, 152.56], [155.84, 157.8, 154.53, 155.95], [154.96, 155.34, 153.32, 154.71], [159.54, 160.93, 158.42, 158.59], [162.29, 162.41, 160.83, 162.22], [155.47, 157.44, 154.7, 155.71], [154.44, 155.22, 154.37, 154.44], [155.45, 156.84, 153.31, 154.81], [156.75, 158.96, 154.9, 157.94], [154.78, 154.97, 154.76, 154.79], [157.14, 157.18, 155.52, 156.02], [155.19, 156.5, 154.19, 155.98], [155.38, 156.12, 154.75, 154.75], [155.05, 157.24, 154.45, 155.78], [154.1, 155.37, 152.68, 154.65], [151.95, 154.1, 151.43, 151.73], [147.09, 147.33, 144.7, 146.66], [147.71, 148.68, 147.05, 147.99], [150.22, 150.81, 149.02, 149.42], [153.29, 153.56, 152.06, 152.49], [148.21, 150.36, 147.11, 147.93], [153.68, 154.27, 152.84, 153.75], [154.21, 154.97, 154.0, 154.03], [151.38, 152.4, 151.28, 151.59], [151.3, 152.33, 149.13, 149.7], [152.28, 153.82, 151.6, 151.99], [152.83, 154.99, 152.54, 154.03], [159.6, 160.94, 157.82, 158.45], [159.3, 160.49, 157.28, 159.56], [155.65, 158.1, 154.73, 156.5], [158.9, 159.7, 156.84, 159.45], [160.17, 160.87, 159.71, 159.83], [161.95, 162.15, 161.22, 161.54], [161.72, 162.86, 161.72, 162.25], [163.3, 163.48, 163.17, 163.3], [165.88, 166.31, 165.0, 165.18], [161.5, 162.79, 160.59, 162.73], [158.27, 160.95, 156.77, 159.95], [155.87, 156.83, 155.4, 156.35], [161.76, 161.78, 160.72, 161.3], [165.52, 166.59, 164.7, 164.84], [165.19, 165.79, 163.59, 164.49], [173.88, 174.11, 172.93, 173.03], [173.11, 174.12, 172.5, 172.5], [173.97, 175.15, 172.9, 173.72], [177.53, 177.75, 177.09, 177.15], [179.32, 180.76, 179.31, 180.08], [177.77, 179.95, 177.17, 179.21], [179.49, 181.18, 177.52, 179.66], [183.37, 184.22, 181.37, 184.02], [186.5, 187.99, 185.8, 187.93], [181.3, 182.76, 179.77, 182.07], [184.04, 184.81, 181.92, 183.57], [179.28, 180.78, 178.12, 179.64], [179.9, 181.61, 178.22, 179.55], [178.54, 178.83, 177.72, 178.76], [179.79, 180.58, 179.61, 179.86], [176.42, 178.01, 176.18, 176.4], [171.5, 172.0, 171.03, 171.67], [170.87, 171.6, 170.8, 171.45], [171.81, 173.71, 171.43, 172.31], [168.49, 169.06, 168.38, 168.56], [168.69, 169.02, 166.04, 167.14], [168.96, 171.35, 168.71, 170.58], [178.29, 179.65, 177.24, 178.06], [179.56, 180.22, 178.4, 179.67], [176.27, 178.51, 175.86, 176.09], [179.9, 180.77, 179.6, 179.88], [181.64, 184.11, 179.82, 182.2], [182.71, 184.57, 181.93, 183.02], [180.74, 182.02, 179.29, 181.24], [179.38, 179.43, 178.47, 178.8], [182.16, 185.04, 182.15, 182.54], [180.15, 182.07, 178.22, 180.18], [174.85, 177.62, 173.62, 175.91], [175.39, 175.73, 174.24, 175.61], [170.65, 171.02, 170.17, 170.7], [167.78, 168.26, 166.09, 167.67], [166.89, 167.91, 165.95, 167.2], [168.38, 168.96, 165.92, 168.04], [169.86, 171.76, 167.45, 167.98], [168.64, 168.89, 168.0, 168.37], [169.44, 171.64, 169.44, 170.74], [167.66, 168.32, 166.61, 167.24], [168.46, 168.57, 166.7, 168.12], [169.11, 169.57, 168.35, 169.47], [172.7, 173.28, 171.28, 171.43], [176.56, 177.52, 175.61, 176.34], [174.95, 177.73, 174.01, 176.2], [178.5, 179.07, 178.1, 178.59], [178.82, 179.44, 176.67, 177.76], [173.76, 175.53, 173.08, 173.53], [180.42, 181.52, 179.84, 180.79], [176.37, 177.51, 176.11, 177.2], [176.03, 176.9, 175.9, 176.41], [175.86, 177.33, 174.73, 175.12], [172.54, 173.32, 170.93, 172.49], [172.28, 173.83, 172.13, 172.15], [172.48, 175.31, 172.44, 173.26], [171.96, 172.24, 170.73, 171.35], [165.69, 166.16, 164.85, 166.14], [166.58, 167.32, 164.91, 167.01], [173.97, 174.44, 173.79, 174.42], [168.79, 170.84, 167.98, 170.22], [178.77, 179.04, 177.63, 178.62], [183.25, 184.58, 179.46, 184.16], [183.42, 185.8, 182.74, 182.75], [180.3, 181.59, 179.61, 180.91], [180.9, 182.02, 180.36, 181.02]], "volumen": [137449363, 178711595, 187723469, 153613375, 180804610, 211895183, 192122756, 212732246, 171696602, 141395889, 193426749, 124529117, 136133498, 178377288, 182508902, 175503815, 188152733, 188536830, 163559221, 164745143, 146845940, 203125934, 164784341, 125608730, 182082866, 179710259, 240372126, 202332461, 130663199, 192930116, 150601986, 152958533, 199966186, 191815144, 193910245, 176688608, 206696475, 160699989, 116543612, 118545121, 170035222, 224611610, 166630882, 134295071, 143959000, 160779723, 181096217, 216428252, 146486321, 207414496, 149296737, 205018177, 112382105, 198183252, 202295553, 165895377, 147543623, 139372788, 193318282, 97060738, 237910446, 194135606, 138298108, 163163088, 140144004, 79247838, 167637908, 145427504, 180194290, 206308559, 233733971, 143815840, 186049151, 197620493, 166163870, 125954893, 185625632, 195895098, 156636883, 176185506, 227910513, 195544550, 162567018, 260832087, 129150169, 170852589, 161482393, 118761176, 189823828, 188058920, 197317233, 108328697, 171107026, 210751031, 167154505, 169191268, 194544527, 74743961, 175160374, 191416312, 195706135, 144086234, 188315509, 174258135, 191086297, 203158140, 211347804, 170682665, 190374373, 170638316, 193593340, 169645807, 223300370, 197508762, 217801199, 153915777, 170843787, 161889820, 196870278, 157646795, 145330096, 175935454, 171847333, 133885287, 196102157, 168947569, 139266806, 164734129, 169435120, 108779959, 117535977, 122414699, 178592703, 189198677, 124259530, 166989079, 199613845, 156610316, 146344268, 179121441, 186720976, 164304895, 145977187, 205850661, 191828938, 182908866, 198434559, 161091013, 171289330, 165037644], "medias": {"WMA10": [null, null, null, null, null, null, null, null, null, 122.25, 123.25, 124.58, 126.05, 127.15, 128.8, 129.96, 131.14, 132.43, 132.65, 133.23, 133.88, 134.26, 135.3, 136.14, 136.54, 137.04, 137.8, 138.7, 139.42, 140.18, 141.01, 141.74, 142.91, 144.79, 147.1, 148.39, 149.94, 151.18, 152.36, 152.58, 153.39, 153.48, 154.03, 154.2, 155.02, 156.44, 156.49, 156.28, 156.14, 156.58, 156.31, 156.29, 156.19, 155.87, 155.73, 155.44, 154.76, 153.22, 152.08, 151.31, 151.26, 150.42, 150.78, 151.24, 151.27, 151.03, 151.29, 151.93, 153.23, 154.54, 155.11, 156.15, 157.04, 158.14, 159.23, 160.31, 161.49, 161.99, 161.82, 160.97, 161.08, 161.74, 162.24, 164.21, 165.88, 167.58, 169.71, 172.16, 174.14, 175.85, 177.92, 180.3, 181.19, 182.03, 181.97, 181.76, 181.3, 181.01, 180.09, 178.37, 176.75, 175.52, 173.89, 172.25, 171.53, 172.33, 173.46, 173.92, 175.13, 176.71, 178.24, 179.24, 179.63, 180.52, 180.69, 179.92, 179.13, 177.52, 175.46, 173.53, 172.03, 170.8, 169.87, 169.56, 168.84, 168.5, 168.56, 169.08, 170.49, 171.71, 173.2, 174.34, 174.54, 175.97, 176.56, 176.83, 176.71, 176.01, 175.23, 174.73, 173.93, 172.32, 171.08, 171.3, 170.88, 172.11, 174.3, 176.08, 177.33, 178.45], "WMA21": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 130.38, 131.11, 132.15, 133.07, 133.76, 134.46, 135.26, 136.11, 136.84, 137.59, 138.37, 139.09, 140.03, 141.32, 142.86, 143.93, 145.19, 146.33, 147.46, 148.16, 149.15, 149.79, 150.67, 151.35, 152.31, 153.52, 154.02, 154.34, 154.63, 155.15, 155.31, 155.53, 155.69, 155.69, 155.75, 155.68, 155.36, 154.58, 153.95, 153.47, 153.31, 152.72, 152.69, 152.68, 152.46, 152.08, 151.95, 152.05, 152.55, 153.14, 153.43, 154.0, 154.58, 155.3, 156.06, 156.88, 157.84, 158.53, 158.93, 158.93, 159.36, 160.05, 160.65, 161.96, 163.14, 164.35, 165.78, 167.35, 168.73, 170.03, 171.64, 173.5, 174.69, 175.92, 176.69, 177.37, 177.91, 178.47, 178.66, 178.37, 178.0, 177.64, 176.89, 176.0, 175.41, 175.52, 175.74, 175.61, 175.83, 176.27, 176.76, 177.08, 177.19, 177.68, 177.95, 177.85, 177.74, 177.19, 176.41, 175.64, 174.98, 174.34, 173.74, 173.38, 172.69, 172.07, 171.6, 171.33, 171.55, 171.76, 172.2, 172.58, 172.59, 173.31, 173.68, 174.01, 174.23, 174.22, 174.2, 174.27, 174.13, 173.51, 172.98, 173.12, 172.86, 173.36, 174.31, 175.07, 175.61, 176.11], "EMA50": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 139.91, 140.5, 141.1, 141.69, 142.2, 142.73, 143.2, 143.53, 143.66, 143.83, 144.05, 144.38, 144.52, 144.88, 145.24, 145.49, 145.65, 145.9, 146.22, 146.7, 147.2, 147.57, 148.03, 148.5, 149.01, 149.53, 150.07, 150.66, 151.13, 151.48, 151.67, 152.05, 152.55, 153.02, 153.8, 154.54, 155.29, 156.15, 157.08, 157.95, 158.8, 159.79, 160.9, 161.73, 162.58, 163.25, 163.89, 164.47, 165.08, 165.52, 165.76, 165.99, 166.23, 166.32, 166.36, 166.52, 166.97, 167.47, 167.81, 168.28, 168.83, 169.39, 169.85, 170.2, 170.69, 171.06, 171.25, 171.42, 171.39, 171.25, 171.09, 170.97, 170.85, 170.75, 170.75, 170.61, 170.52, 170.48, 170.51, 170.74, 170.96, 171.25, 171.51, 171.59, 171.95, 172.16, 172.32, 172.43, 172.43, 172.42, 172.46, 172.41, 172.17, 171.96, 172.06, 171.99, 172.25, 172.72, 173.11, 173.42, 173.71], "SMA200": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}}, "fundamental": {"pe_actual": 41.2, "pe_forward": 32.4, "pe_sector": 28.6, "pe_historico_5a": 45.1, "eps_actual": 4.28, "eps_forward": 5.45, "crecimiento_eps_pct": 27.3, "prima_sector_pct": 44.1, "lectura": "El forward muy por debajo del actual indica que el mercado descuenta fuerte crecimiento de ganancias, lo que le da soporte fundamental al sesgo técnico alcista.", "riesgo_valuacion": "La prima del 44% sobre el sector deja poco margen: un trimestre por debajo de estimaciones comprime el múltiplo antes que el gráfico reaccione."}, "gestion_riesgo": {"entrada": 171.5, "zona_entrada": [170.0, 173.0], "stop_loss": 165.0, "tp1": 182.0, "tp2": 198.0, "capital_ejemplo": 10000, "invalidacion": "Cierre diario bajo 165 con volumen sobre el promedio: pierde la base del rango y la EMA50, y la estructura de mínimos crecientes queda rota.", "gestion": "Tomar la mitad en TP1 y mover el stop a breakeven. El resto con trailing de 2 ATR.", "riesgo_pct": 3.79, "rr_tp1": 1.62, "rr_tp2": 4.08}, "escenarios": [{"nombre": "Alcista", "probabilidad": 45, "objetivo": 198.0, "descripcion": "Ruptura de 182 con volumen y extensión hacia el objetivo de la bandera.", "disparadores": "Cierre diario sobre 182 con volumen >1,3x el promedio de 20 sesiones.", "retorno_pct": 15.45}, {"nombre": "Neutral", "probabilidad": 35, "objetivo": 175.0, "descripcion": "Continúa el rango 168-182 durante varias semanas más.", "disparadores": "Rechazos sucesivos en 182 sin perder 168.", "retorno_pct": 2.04}, {"nombre": "Bajista", "probabilidad": 20, "objetivo": 158.0, "descripcion": "Pérdida de 168 y búsqueda del mínimo de junio.", "disparadores": "Cierre bajo 168 con volumen creciente y RSI perforando 45.", "retorno_pct": -7.87}], "conclusion": "El activo mantiene tendencia alcista de fondo y lo que se ve en el diario es una pausa, no un techo.\n\nLa entrada tiene mejor relación riesgo-beneficio en la zona baja del rango que persiguiendo el precio actual.", "riesgos": ["Presentación de resultados dentro del horizonte del análisis: puede generar un gap que salte el stop.", "La prima de valuación amplifica cualquier revisión a la baja de estimaciones."], "volume_profile": {"timeframe": "Diario", "ventana": 90, "bins": [{"desde": 147.11, "hasta": 148.81, "volumen": 101746969, "vol_alcista": 0, "vol_bajista": 101746969, "es_poc": false, "en_value_area": false}, {"desde": 148.81, "hasta": 150.52, "volumen": 126729367, "vol_alcista": 0, "vol_bajista": 126729367, "es_poc": false, "en_value_area": false}, {"desde": 150.52, "hasta": 152.22, "volumen": 231998733, "vol_alcista": 117620861, "vol_bajista": 114377872, "es_poc": false, "en_value_area": false}, {"desde": 152.22, "hasta": 153.92, "volumen": 545484156, "vol_alcista": 209406566, "vol_bajista": 336077590, "es_poc": false, "en_value_area": false}, {"desde": 153.92, "hasta": 155.63, "volumen": 350122462, "vol_alcista": 186959374, "vol_bajista": 163163088, "es_poc": false, "en_value_area": false}, {"desde": 155.63, "hasta": 157.33, "volumen": 315235352, "vol_alcista": 315235352, "vol_bajista": 0, "es_poc": false, "en_value_area": false}, {"desde": 157.33, "hasta": 159.03, "volumen": 382436331, "vol_alcista": 312360774, "vol_bajista": 70075557, "es_poc": false, "en_value_area": false}, {"desde": 159.03, "hasta": 160.74, "volumen": 470655886, "vol_alcista": 204032895, "vol_bajista": 266622991, "es_poc": false, "en_value_area": false}, {"desde": 160.74, "hasta": 162.44, "volumen": 719686023, "vol_alcista": 264610125, "vol_bajista": 455075899, "es_poc": false, "en_value_area": false}, {"desde": 162.44, "hasta": 164.14, "volumen": 259226358, "vol_alcista": 218338290, "vol_bajista": 40888068, "es_poc": false, "en_value_area": false}, {"desde": 164.14, "hasta": 165.85, "volumen": 542028751, "vol_alcista": 181740761, "vol_bajista": 360287990, "es_poc": false, "en_value_area": false}, {"desde": 165.85, "hasta": 167.55, "volumen": 887147738, "vol_alcista": 257232583, "vol_bajista": 629915155, "es_poc": false, "en_value_area": true}, {"desde": 167.55, "hasta": 169.25, "volumen": 1084736968, "vol_alcista": 445122822, "vol_bajista": 639614146, "es_poc": false, "en_value_area": true}, {"desde": 169.25, "hasta": 170.96, "volumen": 645619979, "vol_alcista": 546313265, "vol_bajista": 99306713, "es_poc": false, "en_value_area": true}, {"desde": 170.96, "hasta": 172.66, "volumen": 997522349, "vol_alcista": 522375846, "vol_bajista": 475146503, "es_poc": false, "en_value_area": true}, {"desde": 172.66, "hasta": 174.36, "volumen": 1184238061, "vol_alcista": 407310450, "vol_bajista": 776927611, "es_poc": false, "en_value_area": true}, {"desde": 174.36, "hasta": 176.07, "volumen": 684470961, "vol_alcista": 383247933, "vol_bajista": 301223028, "es_poc": false, "en_value_area": true}, {"desde": 176.07, "hasta": 177.77, "volumen": 1195152673, "vol_alcista": 434404783, "vol_bajista": 760747890, "es_poc": false, "en_value_area": true}, {"desde": 177.77, "hasta": 179.47, "volumen": 1551644723, "vol_alcista": 813020017, "vol_bajista": 738624706, "es_poc": true, "en_value_area": true}, {"desde": 179.47, "hasta": 181.18, "volumen": 1529235441, "vol_alcista": 1238956882, "vol_bajista": 290278558, "es_poc": false, "en_value_area": true}, {"desde": 181.18, "hasta": 182.88, "volumen": 808859802, "vol_alcista": 709855160, "vol_bajista": 99004642, "es_poc": false, "en_value_area": true}, {"desde": 182.88, "hasta": 184.58, "volumen": 661807729, "vol_alcista": 447922965, "vol_bajista": 213884763, "es_poc": false, "en_value_area": true}, {"desde": 184.58, "hasta": 186.29, "volumen": 135862458, "vol_alcista": 55282617, "vol_bajista": 80579841, "es_poc": false, "en_value_area": false}, {"desde": 186.29, "hasta": 187.99, "volumen": 84255653, "vol_alcista": 84255653, "vol_bajista": 0, "es_poc": false, "en_value_area": false}], "poc": 178.62, "vah": 184.58, "val": 165.85, "volumen_total": 15495904922, "pct_en_value_area": 72.5, "posicion_precio": "en la mitad alta de la value area", "hvn": [{"desde": 177.77, "hasta": 179.47, "pct_del_total": 10.0}, {"desde": 179.47, "hasta": 181.18, "pct_del_total": 9.9}, {"desde": 176.07, "hasta": 177.77, "pct_del_total": 7.7}], "lvn": [{"desde": 147.11, "hasta": 148.81, "pct_del_total": 0.7}, {"desde": 148.81, "hasta": 150.52, "pct_del_total": 0.8}, {"desde": 150.52, "hasta": 152.22, "pct_del_total": 1.5}], "sesgo_flujo": 53.9, "lectura": "El grueso del volumen de los ultimos 90 dias se negocio entre 165,85 y 184,58, con el POC en 178,62. El precio cotiza en la mitad alta de esa zona: hay oferta conocida arriba y un piso de posiciones defendidas abajo."}, "koncorde": {"timeframe": "Diario", "fechas": ["2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-06", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-01", "2026-05-04", "2026-05-05", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-19", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30", "2026-07-31", "2026-08-03", "2026-08-04", "2026-08-05", "2026-08-06", "2026-08-07", "2026-08-10", "2026-08-11", "2026-08-12"], "verde": [134.3, 124.3, 153.3, 155.7, 175.1, 153.9, 163.4, 156.4, 151.5, 111.7, 136.3, 105.6, 112.9, 103.1, 127.2, 144.3, 93.0, 77.8, 76.3, 96.9, 84.2, 91.9, 82.9, 73.2, 75.6, 66.4, 48.6, 15.1, 29.7, 39.9, 70.2, 49.3, 71.7, 73.9, 61.3, 52.0, 69.5, 78.2, 115.5, 121.0, 96.6, 108.0, 112.1, 121.0, 118.8, 122.4, 130.1, 102.4, 88.9, 65.4, 94.6, 105.5, 100.4, 140.5, 132.6, 131.1, 132.1, 129.9, 115.6, 113.8, 125.4, 129.7, 101.4, 108.8, 93.3, 92.1, 84.9, 85.5, 70.0, 45.2, 39.3, 41.5, 25.5, 18.8, 28.8, 68.3, 79.9, 66.7, 87.9, 91.9, 100.0, 87.9, 74.1, 89.4, 74.1, 56.0, 53.1, 36.6, 15.5, 11.7, 15.3, 25.5, 21.8, 29.0, 7.5, 14.1, 22.7, 39.5, 74.0, 72.3, 92.4, 87.7, 59.0, 107.7, 91.8, 83.5, 74.8, 58.1, 61.7, 68.1, 49.7, 23.5, 24.8, 84.5, 60.9, 96.5, 128.3, 125.4, 103.1, 103.5], "marron": [107.2, 99.7, 110.3, 120.0, 124.1, 112.0, 114.1, 115.8, 117.7, 101.0, 108.5, 94.2, 103.0, 94.5, 104.0, 110.7, 89.2, 79.5, 77.7, 86.1, 74.9, 79.2, 71.9, 68.2, 67.5, 59.4, 42.6, 9.9, 20.1, 31.7, 52.2, 33.9, 58.5, 61.6, 50.7, 42.8, 54.2, 65.0, 90.9, 96.9, 84.8, 97.8, 102.2, 107.9, 107.5, 112.7, 116.9, 97.2, 84.4, 70.7, 86.6, 98.5, 94.3, 115.2, 111.1, 110.2, 114.2, 114.6, 104.2, 104.0, 108.5, 115.2, 99.6, 104.5, 89.6, 89.0, 83.7, 84.5, 75.4, 58.7, 51.6, 52.3, 41.8, 33.0, 35.0, 59.4, 68.8, 56.7, 70.9, 76.5, 84.6, 74.1, 67.5, 83.6, 74.3, 56.2, 54.0, 37.4, 23.7, 19.0, 21.8, 31.4, 27.1, 33.8, 21.4, 26.8, 34.1, 43.9, 62.9, 62.4, 76.1, 75.9, 62.3, 86.6, 72.5, 69.4, 67.1, 51.4, 55.8, 59.0, 48.5, 22.4, 23.9, 56.8, 37.3, 76.3, 93.5, 95.9, 83.4, 86.3], "azul": [91.8, 72.0, 57.8, 126.8, 95.8, 23.6, 20.1, 12.8, 23.3, 19.8, 16.9, 14.5, 51.5, 29.3, 24.7, 21.0, 17.9, 15.3, 16.7, 14.3, -17.1, -15.0, -13.5, -11.8, -10.3, -19.6, -44.5, -86.4, -75.6, -52.9, -46.2, -81.9, -18.8, -16.4, -36.5, -49.1, -42.9, -19.4, -16.9, -14.8, -12.9, 14.5, 12.7, 11.1, 15.9, 23.0, 20.1, 17.6, -8.7, -7.6, -6.7, 24.6, 18.5, 16.2, 9.8, 8.6, 35.4, 54.8, 47.9, 45.6, 39.9, 66.1, 57.8, 50.6, 12.2, 10.7, 9.3, 17.2, 15.0, 13.2, 11.5, 17.5, 15.3, 0.9, 0.8, 0.7, 0.6, -28.7, -25.2, -3.4, -3.0, -16.8, -14.7, 17.3, 15.2, -21.7, -19.0, -56.8, -49.7, -47.4, -34.5, -30.2, -23.2, -0.5, -0.4, 7.1, 17.7, 15.5, 13.6, 10.7, 9.4, 8.2, 7.2, 6.3, -23.1, -20.3, -17.7, -36.7, -34.9, -30.9, -27.0, -66.4, -50.9, -44.6, -72.0, 3.0, 2.6, -8.5, -7.4, -5.6], "media": [null, null, null, null, null, null, null, null, 108.1, 107.2, 107.4, 105.7, 105.4, 104.0, 104.0, 104.9, 102.9, 100.0, 97.2, 95.8, 93.2, 91.5, 89.0, 86.4, 84.1, 81.0, 76.2, 67.9, 61.9, 58.1, 57.4, 54.4, 55.0, 55.8, 55.1, 53.6, 53.7, 55.1, 59.6, 64.2, 66.8, 70.7, 74.6, 78.8, 82.4, 86.1, 90.0, 90.9, 90.1, 87.7, 87.5, 88.9, 89.6, 92.8, 95.1, 96.9, 99.1, 101.0, 101.4, 101.7, 102.6, 104.2, 103.6, 103.7, 101.9, 100.3, 98.3, 96.5, 93.9, 89.5, 84.8, 80.7, 75.8, 70.5, 66.1, 65.2, 65.7, 64.5, 65.3, 66.7, 69.0, 69.6, 69.3, 71.1, 71.5, 69.6, 67.7, 63.9, 58.9, 53.9, 49.9, 47.6, 45.0, 43.6, 40.8, 39.1, 38.4, 39.1, 42.1, 44.6, 48.6, 52.0, 53.3, 57.4, 59.3, 60.6, 61.4, 60.1, 59.6, 59.5, 58.2, 53.7, 50.0, 50.8, 49.1, 52.5, 57.6, 62.4, 65.1, 67.7], "azul_actual": -5.6, "verde_actual": 103.5, "marron_actual": 86.3, "media_actual": 67.7, "azul_delta_10d": 25.2, "verde_delta_10d": 35.4, "picos_nevados": 124.1, "mar": 9.9, "estado": "Neutral", "detalle_auto": "Sin sesgo claro de mano fuerte.", "lectura": "El azul se recupero 25 puntos en diez ruedas pero sigue apenas bajo cero: la mano fuerte volvio a comprar sin haber completado la reposicion. El verde en 103 muestra al minorista muy activo, lo que resta calidad al tramo alcista.", "divergencia": "El precio hizo maximo en 184,48 con el azul por debajo de su lectura de junio. Es divergencia bajista de mano fuerte: no invalida la tendencia pero pide confirmacion por volumen antes de agrandar posicion."}};
+
+/* ============ utils ============ */
+const $ = s => document.querySelector(s);
+const el = (t,c,h)=>{const e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e;};
+const CUR = (DATA.meta && DATA.meta.moneda) || 'USD';
+const SYM = {USD:'US$',ARS:'$',EUR:'€',BRL:'R$',GBP:'£'}[CUR] || '';
+const DEC = (DATA.meta && DATA.meta.decimales != null) ? DATA.meta.decimales : 2;
+function n(v,d){ if(v==null||v===''||isNaN(v)) return '—';
+  return Number(v).toLocaleString('es-AR',{minimumFractionDigits:d??DEC,maximumFractionDigits:d??DEC}); }
+function money(v,d){ return v==null||isNaN(v) ? '—' : SYM+' '+n(v,d); }
+function pct(v,d){ return v==null||isNaN(v) ? '—' : (v>0?'+':'')+n(v,d??1)+'%'; }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function biasClass(b){ b=(b||'').toLowerCase();
+  if(b.startsWith('alc')||b==='bull'||b.startsWith('posit')) return 'bull';
+  if(b.startsWith('baj')||b==='bear'||b.startsWith('negat')) return 'bear';
+  return 'neut'; }
+const COL = {bull:'#128f4b', bear:'#c8302a', neut:'#8a6d1f', accent:'#1f4f9c', ink:'#12161c', ink3:'#828c99'};
+function svgEl(t,a){ const e=document.createElementNS('http://www.w3.org/2000/svg',t);
+  for(const k in a) e.setAttribute(k,a[k]); return e; }
+function estBadge(f){ return f ? '<span class="est" title="Dato estimado o no verificado en fuente primaria">EST</span>' : ''; }
+
+/* ============ tooltip ============ */
+const tip=$('#tip');
+function bindTip(node, html){
+  node.addEventListener('mouseenter',()=>{tip.innerHTML=html;tip.style.opacity=1;});
+  node.addEventListener('mousemove',e=>{
+    const w=tip.offsetWidth,h=tip.offsetHeight;
+    let x=e.clientX+16,y=e.clientY+16;
+    if(x+w>innerWidth-12) x=e.clientX-w-16;
+    if(y+h>innerHeight-12) y=e.clientY-h-16;
+    tip.style.left=x+'px'; tip.style.top=y+'px';});
+  node.addEventListener('mouseleave',()=>{tip.style.opacity=0;});
+}
+
+/* ============ header ============ */
+(function header(){
+  const m=DATA.meta||{}, r=DATA.resumen||{};
+  $('#h-ticker').textContent=m.ticker||'—';
+  $('#h-company').textContent=m.nombre||'';
+  $('#h-sector').textContent=m.sector||'Sector n/d';
+  $('#h-price').textContent=money(m.precio_actual);
+  const ch=m.variacion_dia_pct;
+  const chEl=$('#h-chg');
+  chEl.textContent = ch==null?'':pct(ch,2)+' hoy';
+  chEl.className='chg mono '+(ch>0?'up':ch<0?'down':'flat');
+  const meta=[];
+  if(m.exchange) meta.push(esc(m.exchange));
+  if(m.fecha_analisis) meta.push('Análisis: '+esc(m.fecha_analisis));
+  if(m.horizonte) meta.push('Horizonte: '+esc(m.horizonte));
+  if(m.rango_52s) meta.push('Rango 52s: '+money(m.rango_52s[0])+' – '+money(m.rango_52s[1]));
+  $('#h-meta').innerHTML=meta.map(x=>'<span>'+x+'</span>').join('');
+
+  const bc=biasClass(r.sesgo);
+  const conf=(r.confianza||'').toLowerCase();
+  const confCls = conf.startsWith('alt')?'c-bull':conf.startsWith('baj')?'c-bear':'c-neut';
+  $('#h-chips').innerHTML =
+    `<span class="chip c-${bc}"><span class="lbl">Sesgo</span>${esc(r.sesgo||'—')}</span>`+
+    `<span class="chip ${confCls}"><span class="lbl">Confianza</span>${esc(r.confianza||'—')}</span>`+
+    `<span class="chip c-acc"><span class="lbl">Score técnico</span>${r.score!=null?r.score+'/100':'—'}</span>`+
+    (DATA.gestion_riesgo&&DATA.gestion_riesgo.rr_tp2!=null
+      ? `<span class="chip c-acc"><span class="lbl">R/R a TP2</span>${n(DATA.gestion_riesgo.rr_tp2,2)}</span>`:'');
+  $('#h-tesis').innerHTML=esc(r.tesis||'');
+})();
+
+/* ============ gauge ============ */
+(function gauge(){
+  const s=$('#gauge'), score=(DATA.resumen&&DATA.resumen.score)!=null?DATA.resumen.score:0;
+  const cx=120,cy=118,R=88,W=19;
+  const arc=(a0,a1,r,w,col,op)=>{
+    const p0={x:cx+r*Math.cos(a0),y:cy+r*Math.sin(a0)}, p1={x:cx+r*Math.cos(a1),y:cy+r*Math.sin(a1)};
+    const large=(a1-a0)>Math.PI?1:0;
+    s.appendChild(svgEl('path',{d:`M${p0.x} ${p0.y} A${r} ${r} 0 ${large} 1 ${p1.x} ${p1.y}`,
+      fill:'none',stroke:col,'stroke-width':w,'stroke-linecap':'round','opacity':op==null?1:op}));
+  };
+  const A=Math.PI, ang=v=>A+(v/100)*A;
+  const zones=[[0,25,COL.bear],[25,45,'#d98324'],[45,55,COL.neut],[55,75,'#4fa86b'],[75,100,COL.bull]];
+  zones.forEach(z=>arc(ang(z[0]),ang(z[1]),R,W,z[2],.20));
+  arc(ang(0),ang(Math.max(score,0.6)),R,W,score>=55?COL.bull:score<=45?COL.bear:COL.neut,1);
+  const a=ang(score);
+  s.appendChild(svgEl('circle',{cx:cx+R*Math.cos(a),cy:cy+R*Math.sin(a),r:6.5,fill:'#fff',
+    stroke:COL.ink,'stroke-width':2.5}));
+  const t=svgEl('text',{x:cx,y:cy-4,'text-anchor':'middle','font-size':'42','font-weight':'700',
+    fill:COL.ink,'font-family':'ui-monospace,Menlo,monospace'}); t.textContent=score;
+  s.appendChild(t);
+  const t2=svgEl('text',{x:cx,y:cy+18,'text-anchor':'middle','font-size':'12',fill:COL.ink3,
+    'letter-spacing':'1'}); t2.textContent='SCORE TÉCNICO'; s.appendChild(t2);
+  [['0',cx-R,cy+22],['50',cx,cy-R-10],['100',cx+R,cy+22]].forEach(([txt,x,y])=>{
+    const e=svgEl('text',{x,y,'text-anchor':'middle','font-size':'10.5',fill:COL.ink3});
+    e.textContent=txt; s.appendChild(e);});
+})();
+
+/* ============ price chart ============ */
+const CHART_LAYERS = {};
+(function priceChart(){
+  const ps=DATA.precio_serie;
+  const box=$('#pricechart').parentElement;
+  if(!ps||!ps.fechas||!ps.fechas.length){
+    box.innerHTML='<div style="padding:30px;text-align:center;color:var(--ink3);font-size:13.5px">Serie de precios no disponible. El resto del análisis no depende de este gráfico.</div>';
+    $('#g-tools').style.display='none'; $('#g-sub').textContent=''; return;
+  }
+  $('#g-sub').textContent=(ps.timeframe||'Diario')+' · '+ps.fechas[0]+' → '+ps.fechas[ps.fechas.length-1]+' · '+ps.fechas.length+' velas';
+
+  const layers=[
+    {id:'medias',label:'Medias móviles',col:COL.accent,on:true, has:()=>ps.medias&&Object.keys(ps.medias).length},
+    {id:'sr',label:'Soportes / resistencias',col:'#7a6ad6',on:true, has:()=>DATA.niveles},
+    {id:'plan',label:'Entrada · SL · TP',col:COL.bull,on:true, has:()=>DATA.gestion_riesgo},
+    {id:'vol',label:'Volumen',col:COL.ink3,on:true, has:()=>ps.volumen&&ps.volumen.length},
+    {id:'vp',label:'Perfil de volumen',col:'#7a6ad6',on:true,
+     has:()=>DATA.volume_profile&&(DATA.volume_profile.bins||[]).length}
+  ].filter(l=>l.has());
+  layers.forEach(l=>CHART_LAYERS[l.id]=l.on);
+  const tools=$('#g-tools');
+  layers.forEach(l=>{
+    const b=el('button','tgl'+(l.on?' on':''),`<span class="dot" style="color:${l.col}"></span>${l.label}`);
+    b.onclick=()=>{CHART_LAYERS[l.id]=!CHART_LAYERS[l.id]; b.classList.toggle('on'); draw();};
+    tools.appendChild(b);
+  });
+
+  const W=1000,H=470, P={t:14,r:78,b:26,l:10};
+  const hasVol=ps.volumen&&ps.volumen.length;
+  const volH=hasVol?62:0, gap=hasVol?12:0;
+  const plotH=H-P.t-P.b-volH-gap;
+
+  const closes=ps.cierres||(ps.ohlc||[]).map(o=>o[3]);
+  const ohlc=ps.ohlc||null;
+
+  function draw(){
+    const s=$('#pricechart'); s.innerHTML='';
+    // y-domain
+    let lo=Infinity,hi=-Infinity;
+    (ohlc?ohlc.flatMap(o=>[o[1],o[2]]):closes).forEach(v=>{if(v<lo)lo=v; if(v>hi)hi=v;});
+    if(CHART_LAYERS.medias && ps.medias) Object.values(ps.medias).forEach(a=>a.forEach(v=>{
+      if(v==null)return; if(v<lo)lo=v; if(v>hi)hi=v;}));
+    const extras=[];
+    if(CHART_LAYERS.sr && DATA.niveles){
+      (DATA.niveles.soportes||[]).forEach(x=>extras.push(x.precio));
+      (DATA.niveles.resistencias||[]).forEach(x=>extras.push(x.precio));
+    }
+    if(CHART_LAYERS.plan && DATA.gestion_riesgo){
+      const g=DATA.gestion_riesgo; [g.entrada,g.stop_loss,g.tp1,g.tp2].forEach(v=>{if(v!=null)extras.push(v);});
+    }
+    extras.forEach(v=>{if(v==null||isNaN(v))return; if(v<lo)lo=v; if(v>hi)hi=v;});
+    const padY=(hi-lo)*0.06||1; lo-=padY; hi+=padY;
+    const N=closes.length;
+    const x=i=>P.l+(i+0.5)*((W-P.l-P.r)/N);
+    const y=v=>P.t+plotH-((v-lo)/(hi-lo))*plotH;
+    const bw=Math.max(1.2,Math.min(11,(W-P.l-P.r)/N*0.62));
+
+    // grid + eje y
+    const ticks=6;
+    for(let i=0;i<=ticks;i++){
+      const v=lo+(hi-lo)*i/ticks, yy=y(v);
+      s.appendChild(svgEl('line',{x1:P.l,x2:W-P.r,y1:yy,y2:yy,class:'gridline'}));
+      const t=svgEl('text',{x:W-P.r+6,y:yy+3.5,class:'axis'}); t.textContent=n(v); s.appendChild(t);
+    }
+    // eje x
+    const step=Math.max(1,Math.floor(N/7));
+    for(let i=0;i<N;i+=step){
+      const t=svgEl('text',{x:x(i),y:H-8,class:'axis','text-anchor':'middle'});
+      t.textContent=String(ps.fechas[i]).slice(0,10); s.appendChild(t);
+    }
+    // volumen
+    if(hasVol && CHART_LAYERS.vol){
+      const vmax=Math.max(...ps.volumen);
+      const vy0=P.t+plotH+gap+volH;
+      ps.volumen.forEach((v,i)=>{
+        const h=Math.max(0.5,(v/vmax)*volH);
+        const up = ohlc ? ohlc[i][3]>=ohlc[i][0] : (i>0?closes[i]>=closes[i-1]:true);
+        s.appendChild(svgEl('rect',{x:x(i)-bw/2,y:vy0-h,width:bw,height:h,
+          fill:up?COL.bull:COL.bear,opacity:.28}));
+      });
+      const t=svgEl('text',{x:W-P.r+6,y:vy0,class:'axis'}); t.textContent='Vol'; s.appendChild(t);
+    }
+    // perfil de volumen (fondo, anclado al borde derecho: las velas se pintan encima)
+    if(CHART_LAYERS.vp && DATA.volume_profile){
+      const vp=DATA.volume_profile, bs=vp.bins||[];
+      const vmb=Math.max(...bs.map(b=>b.volumen||0))||1;
+      const maxW=(W-P.l-P.r)*0.24, x0=W-P.r;
+      bs.forEach(b=>{
+        if(b.hasta==null||b.desde==null||b.hasta<lo||b.desde>hi) return;
+        const yT=y(Math.min(hi,b.hasta)), yB=y(Math.max(lo,b.desde));
+        const hg=Math.max(1,yB-yT-1), wd=Math.max(.6,(b.volumen/vmb)*maxW);
+        const up=b.vol_alcista||0, dn=b.vol_bajista||0, op=b.es_poc?.55:(b.en_value_area?.34:.20);
+        if(up+dn>0){
+          const wu=wd*up/(up+dn);
+          s.appendChild(svgEl('rect',{x:x0-wd,y:yT,width:Math.max(.3,wd-wu),height:hg,fill:COL.bear,opacity:op}));
+          s.appendChild(svgEl('rect',{x:x0-wu,y:yT,width:Math.max(.3,wu),height:hg,fill:COL.bull,opacity:op}));
+        } else {
+          s.appendChild(svgEl('rect',{x:x0-wd,y:yT,width:wd,height:hg,fill:'#7a6ad6',opacity:op}));
+        }
+      });
+    }
+    // precio
+    if(ohlc){
+      ohlc.forEach((o,i)=>{
+        const up=o[3]>=o[0], c=up?COL.bull:COL.bear;
+        s.appendChild(svgEl('line',{x1:x(i),x2:x(i),y1:y(o[1]),y2:y(o[2]),stroke:c,'stroke-width':1.1}));
+        const yo=y(o[0]),yc=y(o[3]);
+        const g=svgEl('rect',{x:x(i)-bw/2,y:Math.min(yo,yc),width:bw,
+          height:Math.max(1.2,Math.abs(yc-yo)),fill:up?c:c,opacity:up?.9:1});
+        s.appendChild(g);
+        const hit=svgEl('rect',{x:x(i)-bw/2-1,y:P.t,width:bw+2,height:plotH,fill:'transparent'});
+        bindTip(hit,`<b>${esc(ps.fechas[i])}</b><span class="tip-sec">A ${n(o[0])} · Máx ${n(o[1])}<br>Mín ${n(o[2])} · C ${n(o[3])}</span>`);
+        s.appendChild(hit);
+      });
+    } else {
+      const d=closes.map((v,i)=>(i?'L':'M')+x(i)+' '+y(v)).join(' ');
+      s.appendChild(svgEl('path',{d:d+` L${x(N-1)} ${P.t+plotH} L${x(0)} ${P.t+plotH} Z`,
+        fill:COL.accent,opacity:.07}));
+      s.appendChild(svgEl('path',{d,fill:'none',stroke:COL.accent,'stroke-width':1.9}));
+    }
+    // medias
+    if(CHART_LAYERS.medias && ps.medias){
+      const pal=['#e07b39','#7a6ad6','#1f9bb5','#b5561f'];
+      Object.entries(ps.medias).forEach(([nm,arr],k)=>{
+        let d='',started=false;
+        arr.forEach((v,i)=>{ if(v==null){started=false;return;}
+          d+=(started?'L':'M')+x(i)+' '+y(v)+' '; started=true; });
+        if(!d) return;
+        s.appendChild(svgEl('path',{d,fill:'none',stroke:pal[k%pal.length],'stroke-width':1.6,opacity:.95}));
+        const last=arr.filter(v=>v!=null).slice(-1)[0];
+        const t=svgEl('text',{x:P.l+8,y:P.t+16+k*14,'font-size':'11','font-weight':'700',fill:pal[k%pal.length]});
+        t.textContent=nm+' '+n(last); s.appendChild(t);
+      });
+    }
+    // niveles S/R
+    function hline(v,col,label,dash,op,left){
+      if(v==null||isNaN(v)||v<lo||v>hi) return;
+      s.appendChild(svgEl('line',{x1:P.l,x2:W-P.r,y1:y(v),y2:y(v),stroke:col,'stroke-width':1.3,
+        'stroke-dasharray':dash||'5 4',opacity:op==null?.85:op}));
+      const g=svgEl('g',{}); const tw=label.length*5.6+10;
+      const bx = left ? P.l+4 : W-P.r-tw-4;
+      g.appendChild(svgEl('rect',{x:bx,y:y(v)-8,width:tw,height:15,rx:3,fill:col,opacity:.92}));
+      const t=svgEl('text',{x:bx+tw/2,y:y(v)+3,class:'lvl-label',fill:'#fff','text-anchor':'middle'});
+      t.textContent=label; g.appendChild(t); s.appendChild(g);
+    }
+    if(CHART_LAYERS.vp && DATA.volume_profile){
+      const vp=DATA.volume_profile;
+      hline(vp.vah,'#7a6ad6','VAH '+n(vp.vah),'3 4',.55,true);
+      hline(vp.val,'#7a6ad6','VAL '+n(vp.val),'3 4',.55,true);
+      hline(vp.poc,'#5b48c9','POC '+n(vp.poc),'2 0',.95,true);
+    }
+    if(CHART_LAYERS.sr && DATA.niveles){
+      (DATA.niveles.resistencias||[]).forEach((r,i)=>hline(r.precio,'#c8302a','R'+(i+1)+' '+n(r.precio)));
+      (DATA.niveles.soportes||[]).forEach((r,i)=>hline(r.precio,'#128f4b','S'+(i+1)+' '+n(r.precio)));
+    }
+    if(CHART_LAYERS.plan && DATA.gestion_riesgo){
+      const g=DATA.gestion_riesgo;
+      if(g.zona_entrada&&g.zona_entrada.length===2){
+        const y1=y(Math.max(...g.zona_entrada)),y2=y(Math.min(...g.zona_entrada));
+        s.appendChild(svgEl('rect',{x:P.l,y:y1,width:W-P.r-P.l,height:Math.max(2,y2-y1),
+          fill:COL.accent,opacity:.10}));
+      }
+      hline(g.entrada,COL.accent,'Entrada '+n(g.entrada),'2 0',1);
+      hline(g.stop_loss,'#c8302a','SL '+n(g.stop_loss),'8 3',1);
+      hline(g.tp1,'#128f4b','TP1 '+n(g.tp1),'8 3',1);
+      hline(g.tp2,'#0d6e3a','TP2 '+n(g.tp2),'8 3',1);
+    }
+    // precio actual
+    const pa=(DATA.meta||{}).precio_actual;
+    if(pa!=null&&pa>=lo&&pa<=hi){
+      s.appendChild(svgEl('line',{x1:P.l,x2:W-P.r,y1:y(pa),y2:y(pa),stroke:COL.ink,'stroke-width':1,opacity:.45}));
+    }
+  }
+  draw();
+})();
+
+/* ============ score bars ============ */
+(function scoreBars(){
+  const c=$('#score-bars'), comp=DATA.scoring||[];
+  if(!comp.length){ $('#score').style.display='none'; return; }
+  const wrap=el('div','score-wrap');
+  const left=el('div','');
+  const total=comp.reduce((a,b)=>a+(b.puntaje||0),0), maxT=comp.reduce((a,b)=>a+(b.peso||0),0);
+  left.innerHTML=`<div style="font-size:52px;font-weight:700;letter-spacing:-2px;font-family:var(--mono)">${total}<span style="font-size:22px;color:var(--ink3)">/${maxT}</span></div>
+  <div style="font-size:13px;color:var(--ink3);margin-top:-6px">puntos técnicos acumulados</div>`;
+  const right=el('div','');
+  comp.forEach(k=>{
+    const ratio=(k.peso?k.puntaje/k.peso:0);
+    const col = ratio>=.66?COL.bull : ratio<=.34?COL.bear : COL.neut;
+    const row=el('div','bar-row');
+    row.innerHTML=`<div style="font-weight:600">${esc(k.componente)}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.max(0,Math.min(100,ratio*100))}%;background:${col}"></div></div>
+      <div class="bar-val">${k.puntaje}/${k.peso}</div>`;
+    right.appendChild(row);
+    if(k.nota) right.appendChild(el('div','bar-note',esc(k.nota)));
+  });
+  wrap.appendChild(left); wrap.appendChild(right); c.appendChild(wrap);
+})();
+
+/* ============ tendencia ============ */
+(function tendencia(){
+  const t=DATA.tendencia||{}, g=$('#tf-grid');
+  const order=['diario','semanal','mensual','intradiario'];
+  let any=false;
+  order.forEach(k=>{
+    const v=t[k]; if(!v) return; any=true;
+    const bc=biasClass(v.direccion);
+    const d=el('div','panel');
+    d.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <span class="pill-tf">${k.toUpperCase()}</span>
+      <span class="tag t-${bc}">${esc(v.direccion||'—')}</span></div>
+      ${v.estructura?`<div style="font-size:13px;font-weight:600;margin-bottom:5px">${esc(v.estructura)}</div>`:''}
+      <div style="font-size:13.5px;color:var(--ink2)">${esc(v.comentario||'')}</div>`;
+    g.appendChild(d);
+  });
+  if(!any) g.parentElement.style.display='none';
+  if(t.confluencia) $('#tf-conf').innerHTML=`<div class="callout"><b>Confluencia:</b> ${esc(t.confluencia)}</div>`;
+})();
+
+/* ============ indicadores ============ */
+(function indicadores(){
+  const list=$('#ind-list'), inds=DATA.indicadores||[];
+  if(!inds.length){ $('#indicadores').style.display='none'; return; }
+  inds.forEach(i=>{
+    const bc=biasClass(i.sesgo);
+    const d=el('div','ind');
+    let scale='';
+    if(i.escala && i.escala.valor!=null){
+      const e=i.escala, span=(e.max-e.min)||1;
+      const zonas=(e.zonas||[]).map(z=>{
+        const l=((z.desde-e.min)/span)*100, w=((z.hasta-z.desde)/span)*100;
+        const col={bull:COL.bull,bear:COL.bear,neut:COL.neut}[z.color]||COL.ink3;
+        return `<span class="zone" style="left:${l}%;width:${w}%;background:${col};opacity:.28"></span>`;
+      }).join('');
+      const p=Math.max(0,Math.min(100,((e.valor-e.min)/span)*100));
+      scale=`<div class="scale">${zonas}<span class="marker" style="left:calc(${p}% - 1.5px)"></span></div>
+        <div class="scale-ends"><span>${n(e.min,e.dec??0)}</span><span>${n(e.max,e.dec??0)}</span></div>`;
+    }
+    d.innerHTML=`<div class="ind-head">
+        <div><span class="ind-name">${esc(i.nombre)}</span>${i.timeframe?`<span class="ind-tf">${esc(i.timeframe)}</span>`:''}</div>
+        <div class="ind-val" style="color:${COL[bc]}">${esc(i.valor)}</div>
+      </div>
+      <div style="margin-top:4px"><span class="tag t-${bc}">${esc(i.sesgo||'neutral')}</span></div>
+      ${scale}
+      <div class="ind-read">${esc(i.lectura||'')}</div>`;
+    bindTip(d,`<b>${esc(i.nombre)}</b><span class="tip-sec">${esc(i.que_mide||'')}</span>`+
+      `<span class="tip-sec">Valor actual: <b>${esc(i.valor)}</b> — ${esc(i.lectura||'')}</span>`+
+      (i.limitacion?`<span class="tip-sec" style="opacity:.75">⚠ ${esc(i.limitacion)}</span>`:''));
+    list.appendChild(d);
+  });
+})();
+
+/* ============ perfil de volumen ============ */
+(function volumeProfile(){
+  const vp=DATA.volume_profile;
+  const bs=vp&&vp.bins?vp.bins.filter(b=>b&&b.desde!=null&&b.hasta!=null):[];
+  if(!bs.length){ $('#vp-block').style.display='none'; return; }
+
+  const W=520,H=360,P={t:14,r:96,b:24,l:12};
+  const s=$('#vpchart'); s.innerHTML='';
+  const lo=Math.min(...bs.map(b=>b.desde)), hi=Math.max(...bs.map(b=>b.hasta));
+  const vmax=Math.max(...bs.map(b=>b.volumen||0))||1;
+  const total=bs.reduce((a,b)=>a+(b.volumen||0),0)||1;
+  const plotW=W-P.l-P.r;
+  const y=v=>P.t+(H-P.t-P.b)-((v-lo)/(hi-lo||1))*(H-P.t-P.b);
+  const wOf=v=>Math.max(1,(v/vmax)*plotW);
+
+  // banda de value area de fondo
+  if(vp.val!=null&&vp.vah!=null){
+    s.appendChild(svgEl('rect',{x:P.l,y:y(vp.vah),width:plotW,
+      height:Math.max(2,y(vp.val)-y(vp.vah)),fill:'#7a6ad6',opacity:.07}));
+  }
+  bs.forEach(b=>{
+    const yT=y(b.hasta), yB=y(b.desde), hg=Math.max(1.5,yB-yT-1.2), wd=wOf(b.volumen||0);
+    const up=b.vol_alcista||0, dn=b.vol_bajista||0;
+    const op=b.es_poc?1:(b.en_value_area?.78:.45);
+    if(up+dn>0){
+      const wu=wd*up/(up+dn);
+      s.appendChild(svgEl('rect',{x:P.l,y:yT,width:Math.max(.4,wu),height:hg,
+        fill:COL.bull,opacity:op,rx:1}));
+      s.appendChild(svgEl('rect',{x:P.l+wu,y:yT,width:Math.max(.4,wd-wu),height:hg,
+        fill:COL.bear,opacity:op,rx:1}));
+    } else {
+      s.appendChild(svgEl('rect',{x:P.l,y:yT,width:wd,height:hg,fill:'#7a6ad6',opacity:op,rx:1}));
+    }
+    const et=svgEl('text',{x:P.l+wd+6,y:yT+hg/2+3.5,class:'axis'});
+    et.textContent=n(b.desde)+'–'+n(b.hasta); s.appendChild(et);
+    const hit=svgEl('rect',{x:P.l,y:yT-.6,width:W-P.l-4,height:hg+1.2,fill:'transparent'});
+    const rol=b.es_poc?'POC — mayor volumen negociado del período'
+      :(b.en_value_area?'Dentro de la value area':'Fuera de la value area (zona de bajo interés)');
+    bindTip(hit,`<b>${n(b.desde)} – ${n(b.hasta)}</b>`+
+      `<span class="tip-sec">${n((b.volumen||0)/total*100,1)}% del volumen del período</span>`+
+      (up+dn>0?`<span class="tip-sec">Comprador ${n(up/(up+dn)*100,0)}% · Vendedor ${n(dn/(up+dn)*100,0)}%</span>`:'')+
+      `<span class="tip-sec" style="opacity:.75">${rol}</span>`);
+    s.appendChild(hit);
+  });
+  // POC y precio actual
+  function mark(v,col,lab,dash){
+    if(v==null||isNaN(v)||v<lo||v>hi) return;
+    s.appendChild(svgEl('line',{x1:P.l,x2:W-4,y1:y(v),y2:y(v),stroke:col,'stroke-width':1.4,
+      'stroke-dasharray':dash||'2 0',opacity:.9}));
+    const t=svgEl('text',{x:W-6,y:y(v)-4,class:'axis','text-anchor':'end',fill:col,
+      'font-weight':'700'});
+    t.textContent=lab; s.appendChild(t);
+  }
+  mark(vp.poc,'#5b48c9','POC '+n(vp.poc));
+  mark((DATA.meta||{}).precio_actual,COL.ink,'Precio '+n((DATA.meta||{}).precio_actual),'4 3');
+
+  // lectura al costado
+  const r=$('#vp-read'); const pa=(DATA.meta||{}).precio_actual;
+  const dPoc = (pa!=null&&vp.poc) ? (pa-vp.poc)/vp.poc*100 : null;
+  const filas=[
+    ['POC (punto de control)', money(vp.poc), 'El precio donde más volumen se negoció. Actúa como imán: el mercado tiende a volver ahí.'],
+    ['Value area', (vp.val!=null&&vp.vah!=null)?money(vp.val)+' – '+money(vp.vah):'—',
+     'Rango que concentra el '+(vp.pct_en_value_area!=null?n(vp.pct_en_value_area,0):'70')+'% del volumen. Fuera de él el precio se mueve rápido porque hay poca oferta y demanda.'],
+    ['Precio vs. POC', dPoc!=null?pct(dPoc):'—', vp.posicion_precio?('El precio está '+esc(vp.posicion_precio)+'.'):''],
+    ['Sesgo del flujo', vp.sesgo_flujo!=null?n(vp.sesgo_flujo,0)+'% comprador':'—',
+     'Proporción del volumen del período ejecutado en velas alcistas.']
+  ];
+  let html='<dl class="vp-kv">';
+  filas.forEach(([k,v])=>{ html+=`<dt>${esc(k)}</dt><dd>${v}</dd>`; });
+  html+='</dl>';
+  filas.filter(f=>f[2]).forEach(([k,,d])=>{ html+=`<div class="bar-note" style="margin:0 0 8px">${d}</div>`; });
+  if((vp.hvn||[]).length){
+    html+='<div style="font-size:12.5px;margin-top:12px"><b>Zonas de alto volumen (HVN)</b><br>'+
+      vp.hvn.map(z=>`${money(z.desde)}–${money(z.hasta)} <span class="zone-tag">${n(z.pct_del_total,1)}%</span>`).join('<br>')+
+      '<div class="bar-note" style="margin:6px 0 0">Precio ya "aceptado" por el mercado: el movimiento se frena al entrar en estas zonas.</div></div>';
+  }
+  if((vp.lvn||[]).length){
+    html+='<div style="font-size:12.5px;margin-top:12px"><b>Vacíos de volumen (LVN)</b><br>'+
+      vp.lvn.map(z=>`${money(z.desde)}–${money(z.hasta)} <span class="zone-tag">${n(z.pct_del_total,1)}%</span>`).join('<br>')+
+      '<div class="bar-note" style="margin:6px 0 0">Precio rechazado: cuando el precio entra acá suele atravesarlo rápido, sin apoyo.</div></div>';
+  }
+  if(vp.lectura) html+=`<p style="font-size:13.5px;margin-top:14px">${esc(vp.lectura)}</p>`;
+  r.innerHTML=html;
+})();
+
+/* ============ koncorde ============ */
+(function koncorde(){
+  const k=DATA.koncorde;
+  const fx=k&&k.fechas?k.fechas:null;
+  if(!k||!fx||!fx.length){ $('#k-block').style.display='none'; return; }
+
+  const SER=[
+    {id:'verde', label:'Mano débil (verde)',  fill:'#63E269', line:'#2f7d33'},
+    {id:'marron',label:'Tendencia (marrón)',  fill:'#feeb9e', line:'#F7C815'},
+    {id:'azul',  label:'Mano fuerte (azul)',  fill:'#81BECE', line:'#378BA4'},
+    {id:'media', label:'Media de tendencia',  fill:null,      line:'#d33'}
+  ].filter(x=>(k[x.id]||[]).some(v=>v!=null));
+  const ON={}; SER.forEach(x=>ON[x.id]=true);
+
+  const tools=$('#k-tools');
+  SER.forEach(x=>{
+    const b=el('button','tgl on',`<span class="dot" style="color:${x.fill||x.line}"></span>${x.label}`);
+    b.onclick=()=>{ON[x.id]=!ON[x.id]; b.classList.toggle('on'); draw();};
+    tools.appendChild(b);
+  });
+
+  const W=1000,H=300,P={t:14,r:52,b:24,l:10};
+  const N=fx.length, plotH=H-P.t-P.b, plotW=W-P.l-P.r;
+  const x=i=>P.l+(i+0.5)*(plotW/N);
+
+  function draw(){
+    const s=$('#kchart'); s.innerHTML='';
+    let lo=0,hi=0;
+    SER.forEach(x2=>{ if(!ON[x2.id])return;
+      (k[x2.id]||[]).forEach(v=>{ if(v==null)return; if(v<lo)lo=v; if(v>hi)hi=v; }); });
+    if(hi===lo){hi=lo+1;}
+    const pad=(hi-lo)*0.08; lo-=pad; hi+=pad;
+    const y=v=>P.t+plotH-((v-lo)/(hi-lo))*plotH;
+
+    for(let i=0;i<=4;i++){
+      const v=lo+(hi-lo)*i/4, yy=y(v);
+      s.appendChild(svgEl('line',{x1:P.l,x2:W-P.r,y1:yy,y2:yy,class:'gridline'}));
+      const t=svgEl('text',{x:W-P.r+6,y:yy+3.5,class:'axis'}); t.textContent=n(v,0); s.appendChild(t);
+    }
+    const step=Math.max(1,Math.floor(N/7));
+    for(let i=0;i<N;i+=step){
+      const t=svgEl('text',{x:x(i),y:H-8,class:'axis','text-anchor':'middle'});
+      t.textContent=String(fx[i]).slice(0,10); s.appendChild(t);
+    }
+    // línea cero: el umbral que importa para la mano fuerte
+    if(lo<0&&hi>0){
+      s.appendChild(svgEl('line',{x1:P.l,x2:W-P.r,y1:y(0),y2:y(0),stroke:COL.ink,
+        'stroke-width':1.1,opacity:.5}));
+      const t=svgEl('text',{x:P.l+3,y:y(0)-4,class:'axis','font-weight':'700'});
+      t.textContent='0'; s.appendChild(t);
+    }
+    // áreas: se dibujan de mayor a menor amplitud para que ninguna tape a otra
+    const areas=SER.filter(x2=>x2.fill&&ON[x2.id]).map(x2=>({
+      s:x2, amp:Math.max(...(k[x2.id]||[]).map(v=>v==null?0:Math.abs(v)))
+    })).sort((a,b)=>b.amp-a.amp);
+    const y0=Math.max(P.t,Math.min(P.t+plotH,y(0)));
+    areas.forEach(({s:x2})=>{
+      const a=k[x2.id]||[];
+      let d='',open=false;
+      a.forEach((v,i)=>{
+        if(v==null){ if(open){d+=`L${x(i-1)} ${y0} Z `;open=false;} return; }
+        if(!open){ d+=`M${x(i)} ${y0} `; open=true; }
+        d+=`L${x(i)} ${y(v)} `;
+      });
+      if(open) d+=`L${x(a.length-1)} ${y0} Z`;
+      if(d) s.appendChild(svgEl('path',{d,fill:x2.fill,opacity:.62}));
+      let ld='',st=false;
+      a.forEach((v,i)=>{ if(v==null){st=false;return;} ld+=(st?'L':'M')+x(i)+' '+y(v)+' '; st=true; });
+      if(ld) s.appendChild(svgEl('path',{d:ld,fill:'none',stroke:x2.line,'stroke-width':1.5}));
+    });
+    // media (línea sola, siempre encima)
+    if(ON.media&&(k.media||[]).length){
+      let d='',st=false;
+      k.media.forEach((v,i)=>{ if(v==null){st=false;return;} d+=(st?'L':'M')+x(i)+' '+y(v)+' '; st=true; });
+      if(d) s.appendChild(svgEl('path',{d,fill:'none',stroke:'#d33','stroke-width':1.8}));
+    }
+    // hover por vela
+    for(let i=0;i<N;i++){
+      const hit=svgEl('rect',{x:P.l+i*(plotW/N),y:P.t,width:plotW/N,height:plotH,fill:'transparent'});
+      const row=id=>{ const v=(k[id]||[])[i]; return v==null?'—':n(v,1); };
+      bindTip(hit,`<b>${esc(fx[i])}</b>`+
+        `<span class="tip-sec">Mano fuerte (azul): <b>${row('azul')}</b><br>`+
+        `Mano débil (verde): <b>${row('verde')}</b><br>`+
+        `Tendencia (marrón): <b>${row('marron')}</b><br>`+
+        `Media: <b>${row('media')}</b></span>`);
+      s.appendChild(hit);
+    }
+  }
+  draw();
+
+  // lectura
+  const est=(k.estado||'').toLowerCase();
+  const cls = est.startsWith('acum')?'k-acum' : est.startsWith('distrib')?'k-dist' : 'k-neut';
+  const flecha = est.startsWith('acum')?'▲' : est.startsWith('distrib')?'▼' : '●';
+  let html=`<div class="k-state ${cls}">${flecha} ${esc(k.estado||'Sin lectura')}</div>`;
+  const d10=v=>v==null?'':` <span style="color:var(--ink3);font-size:12px">(${pct(v)} en 10 ruedas)</span>`;
+  html+='<dl class="vp-kv" style="margin-top:8px">'+
+    `<dt>Mano fuerte (azul)</dt><dd>${n(k.azul_actual,1)}${d10(k.azul_delta_10d)}</dd>`+
+    `<dt>Mano débil (verde)</dt><dd>${n(k.verde_actual,1)}${d10(k.verde_delta_10d)}</dd>`+
+    `<dt>Tendencia (marrón)</dt><dd>${n(k.marron_actual,1)}</dd>`+
+    `<dt>Media</dt><dd>${n(k.media_actual,1)}</dd>`+
+    (k.picos_nevados!=null?`<dt>Máximo histórico marrón</dt><dd>${n(k.picos_nevados,1)}</dd>`:'')+
+    (k.mar!=null?`<dt>Mínimo histórico marrón</dt><dd>${n(k.mar,1)}</dd>`:'')+
+    '</dl>';
+  if(k.detalle_auto) html+=`<div class="bar-note" style="margin:0 0 10px">${esc(k.detalle_auto)}</div>`;
+  if(k.lectura) html+=`<p style="font-size:13.5px">${esc(k.lectura)}</p>`;
+  if(k.divergencia) html+=`<p style="font-size:13.5px"><b>Divergencia:</b> ${esc(k.divergencia)}</p>`;
+  html+='<div class="k-legend">'+
+    '<div><span class="sw" style="background:#81BECE"></span>Azul sobre cero = mano fuerte comprada</div>'+
+    '<div><span class="sw" style="background:#63E269"></span>Verde alto con azul cayendo = techo típico</div>'+
+    '<div><span class="sw" style="background:#feeb9e"></span>Marrón no cruza cero por construcción: su referencia es su propia media</div>'+
+    '</div>';
+  $('#k-read').innerHTML=html;
+})();
+
+/* ============ patrones ============ */
+(function patrones(){
+  const c=$('#pat-list'), ps=DATA.patrones||[];
+  if(!ps.length){ c.innerHTML='<p style="color:var(--ink3);font-size:13.5px">No se identifican patrones relevantes con nivel de confirmación suficiente en los marcos analizados.</p>'; return; }
+  const t=el('table','');
+  t.innerHTML='<thead><tr><th>Patrón</th><th>Tipo</th><th>Estado</th><th class="num-col">Objetivo</th><th>Implicancia</th></tr></thead>';
+  const tb=el('tbody','');
+  ps.forEach(p=>{
+    const bc=biasClass(p.sesgo||p.tipo);
+    const st=(p.estado||'').toLowerCase();
+    const stc = st.startsWith('confirm')?'t-bull' : st.startsWith('invalid')?'t-bear':'t-neut';
+    tb.appendChild(el('tr','',`<td><b>${esc(p.nombre)}</b>${p.timeframe?`<span class="ind-tf">${esc(p.timeframe)}</span>`:''}</td>
+      <td><span class="tag t-${bc}">${esc(p.tipo||'—')}</span></td>
+      <td><span class="tag ${stc}">${esc(p.estado||'—')}</span></td>
+      <td class="num-col">${p.objetivo!=null?n(p.objetivo):'—'}</td>
+      <td style="color:var(--ink2)">${esc(p.implicancia||'')}</td>`));
+  });
+  t.appendChild(tb); c.appendChild(t);
+})();
+
+/* ============ niveles ============ */
+(function niveles(){
+  const pa=(DATA.meta||{}).precio_actual, nv=DATA.niveles||{};
+  function fill(sel,arr,col,dir){
+    const ul=$(sel);
+    if(!arr||!arr.length){ ul.innerHTML='<li style="color:var(--ink3);font-size:13px;padding:8px 0">Sin niveles identificados.</li>'; return; }
+    arr.slice().sort((a,b)=>dir*(a.precio-b.precio)).forEach(x=>{
+      const dd = pa? ((x.precio-pa)/pa*100) : null;
+      const f=({fuerte:3,media:2,'débil':1,debil:1}[(x.fuerza||'').toLowerCase()])||2;
+      const li=el('li','lvl-item');
+      li.innerHTML=`<div><div class="lvl-px" style="color:${col}">${n(x.precio)}</div>
+          <div class="dist">${dd!=null?pct(dd,1):''}</div></div>
+        <div class="strength" style="color:${col}">${[1,2,3].map(i=>`<i class="${i<=f?'f':''}"></i>`).join('')}</div>
+        <div style="color:var(--ink2);font-size:13px">${esc(x.origen||'')}</div>`;
+      ul.appendChild(li);
+    });
+  }
+  fill('#res-list',nv.resistencias,COL.bear,1);
+  fill('#sop-list',nv.soportes,COL.bull,-1);
+})();
+
+/* ============ fundamental (PE) ============ */
+(function fundamental(){
+  const f=DATA.fundamental;
+  if(!f){ $('#fundamental').style.display='none'; return; }
+  const items=[
+    ['P/E actual',f.pe_actual,COL.accent],
+    ['P/E forward',f.pe_forward,'#1f9bb5'],
+    ['P/E sector',f.pe_sector,COL.ink3],
+    ['P/E prom. 5a',f.pe_historico_5a,'#7a6ad6']
+  ].filter(x=>x[1]!=null&&!isNaN(x[1]));
+  const s=$('#pechart');
+  if(items.length){
+    const W=480,H=230,P={t:16,r:14,b:34,l:14};
+    const max=Math.max(...items.map(i=>i[1]))*1.18;
+    const bw=(W-P.l-P.r)/items.length, iw=Math.min(66,bw*0.56);
+    items.forEach((it,i)=>{
+      const h=((it[1])/max)*(H-P.t-P.b);
+      const cx=P.l+bw*i+bw/2;
+      s.appendChild(svgEl('rect',{x:cx-iw/2,y:H-P.b-h,width:iw,height:h,rx:5,fill:it[2],opacity:.88}));
+      const v=svgEl('text',{x:cx,y:H-P.b-h-7,'text-anchor':'middle','font-size':'14','font-weight':'700',
+        fill:it[2],'font-family':'ui-monospace,Menlo,monospace'}); v.textContent=n(it[1],1); s.appendChild(v);
+      const l=svgEl('text',{x:cx,y:H-P.b+15,'text-anchor':'middle','font-size':'10.5',fill:COL.ink3});
+      l.textContent=it[0]; s.appendChild(l);
+    });
+    s.appendChild(svgEl('line',{x1:P.l,x2:W-P.r,y1:H-P.b,y2:H-P.b,stroke:'#e3e7ec','stroke-width':1.4}));
+  }
+  const rows=[
+    ['EPS últimos 12m',f.eps_actual!=null?money(f.eps_actual):null],
+    ['EPS estimado próx. 12m',f.eps_forward!=null?money(f.eps_forward):null],
+    ['Crecimiento implícito de EPS',f.crecimiento_eps_pct!=null?pct(f.crecimiento_eps_pct):null],
+    ['Prima / descuento vs sector',f.prima_sector_pct!=null?pct(f.prima_sector_pct):null]
+  ].filter(r=>r[1]);
+  $('#fund-read').innerHTML =
+    rows.map(r=>`<div class="out"><span class="k">${r[0]}</span><span class="v">${r[1]}</span></div>`).join('')+
+    (f.lectura?`<div class="callout" style="margin-top:14px">${esc(f.lectura)}</div>`:'')+
+    (f.riesgo_valuacion?`<div class="callout warn">${esc(f.riesgo_valuacion)}</div>`:'');
+})();
+
+/* ============ risk/reward chart ============ */
+(function rr(){
+  const g=DATA.gestion_riesgo;
+  if(!g){ $('#riesgo').style.display='none'; return; }
+  const s=$('#rrchart'), W=1000,H=180, P={l:60,r:60,t:56,b:44};
+  const vals=[g.stop_loss,g.entrada,g.tp1,g.tp2,(DATA.meta||{}).precio_actual].filter(v=>v!=null&&!isNaN(v));
+  const lo=Math.min(...vals), hi=Math.max(...vals), span=(hi-lo)||1;
+  const x=v=>P.l+((v-lo)/span)*(W-P.l-P.r);
+  const yBar=88, hBar=26;
+  if(g.stop_loss!=null&&g.entrada!=null)
+    s.appendChild(svgEl('rect',{x:x(Math.min(g.stop_loss,g.entrada)),y:yBar,
+      width:Math.abs(x(g.entrada)-x(g.stop_loss)),height:hBar,fill:COL.bear,opacity:.22,rx:4}));
+  if(g.entrada!=null&&g.tp1!=null)
+    s.appendChild(svgEl('rect',{x:x(Math.min(g.entrada,g.tp1)),y:yBar,
+      width:Math.abs(x(g.tp1)-x(g.entrada)),height:hBar,fill:COL.bull,opacity:.20,rx:4}));
+  if(g.tp1!=null&&g.tp2!=null)
+    s.appendChild(svgEl('rect',{x:x(Math.min(g.tp1,g.tp2)),y:yBar,
+      width:Math.abs(x(g.tp2)-x(g.tp1)),height:hBar,fill:COL.bull,opacity:.34,rx:4}));
+  s.appendChild(svgEl('line',{x1:P.l,x2:W-P.r,y1:yBar+hBar/2,y2:yBar+hBar/2,stroke:'#cfd6de','stroke-width':1}));
+  const marks=[
+    ['Stop loss',g.stop_loss,COL.bear,-1],['Entrada',g.entrada,COL.accent,1],
+    ['TP1',g.tp1,COL.bull,-1],['TP2',g.tp2,'#0d6e3a',1]
+  ].filter(m=>m[1]!=null&&!isNaN(m[1]));
+  marks.forEach(m=>{
+    const px=x(m[1]);
+    s.appendChild(svgEl('line',{x1:px,x2:px,y1:yBar-8,y2:yBar+hBar+8,stroke:m[2],'stroke-width':2.4}));
+    const ly = m[3]<0 ? yBar-18 : yBar+hBar+30;
+    const t1=svgEl('text',{x:px,y:ly,'text-anchor':'middle','font-size':'11.5','font-weight':'700',fill:m[2]});
+    t1.textContent=m[0]; s.appendChild(t1);
+    const t2=svgEl('text',{x:px,y:ly+(m[3]<0?-13:14),'text-anchor':'middle','font-size':'13','font-weight':'700',
+      fill:COL.ink,'font-family':'ui-monospace,Menlo,monospace'}); t2.textContent=n(m[1]); s.appendChild(t2);
+  });
+  const pa=(DATA.meta||{}).precio_actual;
+  if(pa!=null){
+    s.appendChild(svgEl('circle',{cx:x(pa),cy:yBar+hBar/2,r:6,fill:'#fff',stroke:COL.ink,'stroke-width':2.4}));
+    const t=svgEl('text',{x:x(pa),y:yBar+hBar/2+4,'text-anchor':'middle','font-size':'9',fill:COL.ink3});
+    s.appendChild(t);
+  }
+  const rows=[
+    ['Entrada sugerida', g.zona_entrada&&g.zona_entrada.length===2
+        ? money(g.zona_entrada[0])+' – '+money(g.zona_entrada[1]) : money(g.entrada)],
+    ['Stop loss', money(g.stop_loss)+(g.riesgo_pct!=null?` <span style="font-size:12px;color:var(--bear)">(${pct(-Math.abs(g.riesgo_pct))})</span>`:'')],
+    ['Take profit 1', money(g.tp1)+(g.tp1!=null&&g.entrada?` <span style="font-size:12px;color:var(--bull)">(${pct((g.tp1-g.entrada)/g.entrada*100)})</span>`:'')],
+    ['Take profit 2', money(g.tp2)+(g.tp2!=null&&g.entrada?` <span style="font-size:12px;color:var(--bull)">(${pct((g.tp2-g.entrada)/g.entrada*100)})</span>`:'')],
+    ['Risk / Reward a TP1', g.rr_tp1!=null?n(g.rr_tp1,2)+' : 1':'—'],
+    ['Risk / Reward a TP2', g.rr_tp2!=null?n(g.rr_tp2,2)+' : 1':'—']
+  ];
+  $('#rr-table').innerHTML=rows.map((r,i)=>
+    `<div class="out ${i>=4?'big':''}"><span class="k">${r[0]}</span><span class="v">${r[1]}</span></div>`).join('');
+  let inv='';
+  if(g.invalidacion) inv+=`<div class="callout warn"><b>Invalidación:</b> ${esc(g.invalidacion)}</div>`;
+  if(g.gestion) inv+=`<div class="callout">${esc(g.gestion)}</div>`;
+  $('#invalid-box').innerHTML=inv;
+
+  // calculadora
+  const q=id=>parseFloat($(id).value);
+  $('#c-entry').value=g.entrada??''; $('#c-sl').value=g.stop_loss??'';
+  $('#c-tp1').value=g.tp1??''; $('#c-tp2').value=g.tp2??'';
+  $('#c-cap').value=g.capital_ejemplo??10000;
+  function calc(){
+    const cap=q('#c-cap'), rk=q('#c-risk'), e=q('#c-entry'), sl=q('#c-sl'), t1=q('#c-tp1'), t2=q('#c-tp2');
+    const out=$('#calc-out');
+    if([cap,rk,e,sl].some(v=>isNaN(v))||e===sl){
+      out.innerHTML='<div style="font-size:13px;color:var(--ink3);padding:8px 0">Completá capital, riesgo, entrada y stop para calcular.</div>'; return;
+    }
+    const perShare=Math.abs(e-sl);
+    const riskAmt=cap*rk/100;
+    const qty=Math.floor(riskAmt/perShare);
+    const notional=qty*e;
+    const expo=cap?notional/cap*100:0;
+    const g1=!isNaN(t1)?qty*(t1-e):null, g2=!isNaN(t2)?qty*(t2-e):null;
+    const rr1=!isNaN(t1)?Math.abs(t1-e)/perShare:null, rr2=!isNaN(t2)?Math.abs(t2-e)/perShare:null;
+    const rows=[
+      ['Cantidad de acciones', qty.toLocaleString('es-AR'), 'big'],
+      ['Capital comprometido', money(notional)+` <span style="font-size:12px;color:var(--ink3)">(${n(expo,1)}% del total)</span>`,''],
+      ['Pérdida máxima si toca SL', `<span style="color:var(--bear)">${money(-qty*perShare)}</span>`,''],
+      ['Ganancia en TP1', g1!=null?`<span style="color:var(--bull)">${money(g1)}</span> <span style="font-size:12px;color:var(--ink3)">(${n(rr1,2)}R)</span>`:'—',''],
+      ['Ganancia en TP2', g2!=null?`<span style="color:var(--bull)">${money(g2)}</span> <span style="font-size:12px;color:var(--ink3)">(${n(rr2,2)}R)</span>`:'—','']
+    ];
+    let warn='';
+    if(expo>100) warn='<div class="callout warn" style="margin:10px 0 0">La posición supera tu capital: requeriría apalancamiento. Reducí el riesgo por operación o alejá menos el stop.</div>';
+    else if(expo>35) warn='<div class="callout" style="margin:10px 0 0">Concentración alta: esta única posición usa más de un tercio del capital.</div>';
+    if(qty===0) warn='<div class="callout warn" style="margin:10px 0 0">El riesgo asignado no alcanza ni para una acción. Subí el capital o el % de riesgo.</div>';
+    out.innerHTML=rows.map(r=>`<div class="out ${r[2]}"><span class="k">${r[0]}</span><span class="v">${r[1]}</span></div>`).join('')+warn;
+  }
+  ['#c-cap','#c-risk','#c-entry','#c-sl','#c-tp1','#c-tp2'].forEach(id=>$(id).addEventListener('input',calc));
+  calc();
+})();
+
+/* ============ escenarios ============ */
+(function escenarios(){
+  const sc=DATA.escenarios||[];
+  if(!sc.length){ $('#escenarios').style.display='none'; return; }
+  // donut
+  const s=$('#scenchart'), cx=150,cy=125,R=88,r=54;
+  const tot=sc.reduce((a,b)=>a+(b.probabilidad||0),0)||100;
+  let a0=-Math.PI/2;
+  sc.forEach(x=>{
+    const frac=(x.probabilidad||0)/tot, a1=a0+frac*Math.PI*2;
+    const col=COL[biasClass(x.nombre)];
+    const p=(rad,a)=>[cx+rad*Math.cos(a),cy+rad*Math.sin(a)];
+    const [x0,y0]=p(R,a0),[x1,y1]=p(R,a1),[x2,y2]=p(r,a1),[x3,y3]=p(r,a0);
+    const big=(a1-a0)>Math.PI?1:0;
+    const path=svgEl('path',{d:`M${x0} ${y0} A${R} ${R} 0 ${big} 1 ${x1} ${y1} L${x2} ${y2} A${r} ${r} 0 ${big} 0 ${x3} ${y3} Z`,
+      fill:col,opacity:.85,stroke:'#fff','stroke-width':2});
+    bindTip(path,`<b>${esc(x.nombre)} · ${x.probabilidad}%</b><span class="tip-sec">${esc(x.descripcion||'')}</span>`);
+    s.appendChild(path);
+    const mid=(a0+a1)/2, [lx,ly]=p((R+r)/2,mid);
+    if(frac>0.07){
+      const t=svgEl('text',{x:lx,y:ly+4,'text-anchor':'middle','font-size':'14','font-weight':'700',fill:'#fff'});
+      t.textContent=x.probabilidad+'%'; s.appendChild(t);
+    }
+    a0=a1;
+  });
+  sc.forEach((x,i)=>{
+    const yy=40+i*26, col=COL[biasClass(x.nombre)];
+    s.appendChild(svgEl('rect',{x:290,y:yy-9,width:11,height:11,rx:3,fill:col,opacity:.85}));
+    const t=svgEl('text',{x:308,y:yy,'font-size':'12.5',fill:COL.ink}); t.textContent=x.nombre; s.appendChild(t);
+    if(x.objetivo!=null){
+      const t2=svgEl('text',{x:308,y:yy+14,'font-size':'11',fill:COL.ink3,
+        'font-family':'ui-monospace,Menlo,monospace'});
+      t2.textContent='obj. '+n(x.objetivo); s.appendChild(t2);
+    }
+  });
+  // lista
+  const c=$('#scen-list');
+  sc.forEach(x=>{
+    const bc=biasClass(x.nombre), d=el('div','panel');
+    d.style.marginBottom='10px';
+    const e=(DATA.gestion_riesgo||{}).entrada ?? (DATA.meta||{}).precio_actual;
+    const ret = x.retorno_pct!=null ? x.retorno_pct : (x.objetivo!=null&&e ? (x.objetivo-e)/e*100 : null);
+    d.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px">
+        <b style="color:${COL[bc]};font-size:15px">${esc(x.nombre)}</b>
+        <span class="mono" style="font-weight:700">${x.probabilidad}%</span></div>
+      <div style="font-size:13.5px;color:var(--ink2);margin-top:6px">${esc(x.descripcion||'')}</div>
+      <div style="display:flex;gap:18px;margin-top:9px;font-size:12.5px;color:var(--ink3)">
+        ${x.objetivo!=null?`<span>Objetivo <b class="mono" style="color:var(--ink)">${n(x.objetivo)}</b></span>`:''}
+        ${ret!=null?`<span>Retorno <b class="mono" style="color:${ret>=0?COL.bull:COL.bear}">${pct(ret)}</b></span>`:''}
+      </div>
+      ${x.disparadores?`<div style="font-size:12.5px;color:var(--ink2);margin-top:8px"><b>Gatillo:</b> ${esc(x.disparadores)}</div>`:''}`;
+    c.appendChild(d);
+  });
+  // simulador
+  const g=DATA.gestion_riesgo||{}, e=g.entrada??(DATA.meta||{}).precio_actual;
+  const objs=sc.map(x=>x.objetivo).filter(v=>v!=null);
+  const loVals=[g.stop_loss,e,...objs].filter(v=>v!=null&&!isNaN(v));
+  const hiVals=[g.tp2,g.tp1,e,...objs].filter(v=>v!=null&&!isNaN(v));
+  if(!loVals.length||!hiVals.length){ $('#sim-range').parentElement.style.display='none'; return; }
+  const lo=Math.min(...loVals)*0.94, hi=Math.max(...hiVals)*1.06;
+  const R1=(e!=null&&g.stop_loss!=null&&e!==g.stop_loss)?Math.abs(e-g.stop_loss):null;
+  const rng=$('#sim-range');
+  function sim(){
+    const p=lo+(hi-lo)*(rng.value/1000);
+    $('#sim-px').textContent=money(p);
+    const ret=e?(p-e)/e*100:null;
+    $('#sim-ret').innerHTML=ret==null?'—':`<span style="color:${ret>=0?COL.bull:COL.bear}">${pct(ret)}</span>`;
+    $('#sim-r').textContent=(R1&&e!=null)?n((p-e)/R1,2)+'R':'—';
+    const cap=parseFloat($('#c-cap').value), rk=parseFloat($('#c-risk').value);
+    let pnl='—';
+    if(!isNaN(cap)&&!isNaN(rk)&&R1&&e!=null){ const qty=Math.floor((cap*rk/100)/R1); pnl=money(qty*(p-e)); }
+    $('#sim-pnl').innerHTML=`<span style="color:${e!=null&&(p-e)>=0?COL.bull:COL.bear}">${pnl}</span>`;
+    let best=null;
+    sc.forEach(x=>{ if(x.objetivo==null) return;
+      if(!best||Math.abs(x.objetivo-p)<Math.abs(best.objetivo-p)) best=x; });
+    const b=$('#sim-badge');
+    if(best){ const bc=biasClass(best.nombre);
+      b.textContent='Escenario más cercano: '+best.nombre+' ('+best.probabilidad+'%)';
+      b.style.background={bull:'#e6f5ed',bear:'#fdeceb',neut:'#fdf5e0'}[bc];
+      b.style.color=COL[bc];
+    } else b.textContent='';
+  }
+  rng.addEventListener('input',sim);
+  if(e){ rng.value=Math.round(((e-lo)/(hi-lo))*1000); }
+  sim();
+  ['#c-cap','#c-risk'].forEach(id=>$(id)&&$(id).addEventListener('input',sim));
+})();
+
+/* ============ conclusión + footer ============ */
+(function fin(){
+  const c=DATA.conclusion||'';
+  $('#concl').innerHTML=String(c).split(/\n\n+/).map(p=>`<p>${esc(p)}</p>`).join('');
+  const rs=DATA.riesgos||[];
+  if(rs.length) $('#riesgos-box').innerHTML=
+    `<h3>Qué invalidaría esta lectura</h3><ul class="clean">${rs.map(r=>`<li>${esc(r)}</li>`).join('')}</ul>`;
+  const srcs=(DATA.meta&&DATA.meta.fuentes)||[];
+  $('#footer').innerHTML=
+    (srcs.length?`<div class="srcs"><b>Fuentes:</b> ${srcs.map(s=>
+      typeof s==='string'?esc(s):`<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.nombre||s.url)}</a>`).join(' · ')}</div>`:'')+
+    `<p style="margin-top:12px"><b>Aviso.</b> Este documento es un análisis técnico con fines informativos y educativos.
+     No constituye asesoramiento financiero, recomendación de inversión ni oferta de compra o venta de instrumentos financieros.
+     Los niveles, objetivos y probabilidades son estimaciones basadas en el comportamiento histórico del precio y pueden fallar.
+     El desempeño pasado no garantiza resultados futuros. Operar instrumentos financieros implica riesgo de pérdida de capital.
+     Toda decisión es responsabilidad exclusiva del lector.</p>`+
+    `<p>Generado el ${esc((DATA.meta&&DATA.meta.fecha_analisis)||'')} · Datos con el cierre indicado en cada sección.</p>`;
+})();
+</script>
+</body>
+</html>

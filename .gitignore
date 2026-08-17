@@ -1,0 +1,22 @@
+# Staging que genera build.py: es una copia byte a byte de analisis-tecnico-boa/
+# y existe solo para que el instalador tenga una carpeta desde donde copiar.
+# Versionarla duplicaria cada cambio en dos lugares del diff.
+/instalar-skills/
+
+# Bytecode. Los tests importan compute_indicators, y un __pycache__ dentro de
+# scripts/ termina copiado dentro de la skill instalada.
+__pycache__/
+*.py[cod]
+
+# Salidas de trabajo: series descargadas, calculos intermedios e informes
+# generados para un ticker real. Lo que se versiona es el demo de examples/.
+serie.json
+calculado.json
+analisis.json
+informe_*.html
+!examples/informe_NVDA_demo.html
+
+# Windows / OneDrive
+Thumbs.db
+desktop.ini
+~$*

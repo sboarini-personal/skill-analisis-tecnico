@@ -1,0 +1,8 @@
+# Todo el proyecto es multiplataforma y se normaliza a LF. Importa mas de lo
+# habitual: el frontmatter de SKILL.md se rompe con CRLF, y build.py verifica
+# justamente eso antes de sincronizar.
+* text=auto eol=lf
+
+# Binarios y salidas que no deben tocarse.
+*.png binary
+*.jpg binary
